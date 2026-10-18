@@ -9,7 +9,7 @@ app.use(cors());
 // Middleware for parsing JSON and urlencoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(checkUseragent)
 
 
 // Root route
@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 
 
 // User routes
-app.use("/api/users",isValid, checkUseragent, userRouter);
+app.use("/api/users",isValid, userRouter);
 
 
 // 404 Route Not Found
