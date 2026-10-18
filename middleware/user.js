@@ -14,16 +14,38 @@ const isValid = (req, res, next) => {
   }
 };
 
-// Middleware: Log and save User-Agent from any client
+// Blocklist of suspicious bots / scanners / scrapers
+const blockedPatterns = [
+  /python-requests/i,
+  /Go-http-client/i,
+  /Java/i,
+  /sqlmap/i,
+  /nmap/i,
+  /Nikto/i,
+  /HeadlessChrome/i,
+  /PhantomJS/i,
+];
+
+// Middleware: Check User-Agent and block malicious clients/bots
 const checkUseragent = (req, res, next) => {
   const userAgent = req.headers["user-agent"] || "Unknown User-Agent";
 
   console.log("This User Hit Right Now:", userAgent);
 
-  // Save user agent to userAgent.json (Browser, Postman, Thunder Client, Mobile, etc.)
+  // Save every hit's User-Agent to userAgent.json for tracking
   saveUserAgent(userAgent);
 
-  // Allow all requests to proceed
+  // Check if User-Agent matches any blocked bot/scanner pattern
+  const isBlocked = blockedPatterns.some((pattern) => pattern.test(userAgent));
+
+  if (isBlocked) {
+    return res.status(403).json({
+      success: false,
+      message: "Access Denied: Your client is blocked",
+    });
+  }
+
+  // Allow all other clients (Chrome, Postman, Thunder Client, mobile, etc.)
   next();
 };
 
