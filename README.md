@@ -1,49 +1,74 @@
-# 🚀 User Management REST API (Express.js)
+# 🛡️ Secure User Management REST API (Express.js)
 
-A clean, modular, and professional RESTful API built with **Node.js** and **Express.js**, following the **MVC (Model-View-Controller)** pattern. This project demonstrates clean routing architecture, controller separation, mock data management, and standard HTTP error handling.
-
----
-
-## 📌 Features
-
-- **Modular Architecture**: Clean separation between server configuration ([`app.js`](./app.js)), routes ([`router/`](./router/)), and business logic ([`controllers/`](./controllers/)).
-- **Complete CRUD Operations**:
-  - `GET` all users
-  - `GET` single user by ID
-  - `POST` create a new user
-  - `PUT` update existing user by ID
-  - `DELETE` remove user by ID
-- **Robust Error Handling**:
-  - Catches 404 for undefined routes
-  - Global 500 internal server error handler
-  - Request body validation
-- **Middleware Support**:
-  - JSON payload parsing (`express.json()`)
-  - URL-encoded form data parsing (`express.urlencoded()`)
+A production-ready, secure, and modular RESTful API built with **Node.js** and **Express.js**, following clean **MVC (Model-View-Controller)** principles. This API features **DDoS protection via rate limiting**, **malicious bot blocking**, **automated User-Agent logging**, **token validation**, and **CORS**.
 
 ---
 
-## 📂 Project Structure
+## 🏗️ Architecture & Request Flow
 
-```plaintext
-API-Part-2/
-├── controllers/
-│   └── userControllers.js   # Request handlers & business logic with mock data
-├── router/
-│   └── user.js              # Express routing definitions
-├── app.js                   # Main application entry point & middleware setup
-├── package.json             # Project dependencies and npm scripts
-├── .gitignore               # Ignored files & folders (e.g. node_modules)
-└── README.md                # Project documentation
+```mermaid
+flowchart TD
+    Client["Client / User / Bot"] -->|"HTTP Request"| CORS["1. CORS Middleware"]
+    CORS --> Parser["2. JSON & URL-encoded Parser"]
+    Parser --> RateLimit["3. Rate Limiter (Max 100 req / 15 min)"]
+    
+    RateLimit -->|Exceeded Limit| Resp429["❌ 429 Too Many Requests"]
+    RateLimit -->|Within Limit| UALogger["4. User-Agent Logger & Bot Blocker"]
+    
+    UALogger -->|Matches Bot Pattern| Resp403["❌ 403 Forbidden (Bot Blocked)"]
+    UALogger -->|Allowed Client| SaveLog["Save User-Agent to userAgent.json"]
+    SaveLog --> TokenAuth["5. Token Validator (?token=123)"]
+    
+    TokenAuth -->|Invalid/Missing Token| Resp401["❌ 401 Unauthorized"]
+    TokenAuth -->|Valid Token| Router["6. User Router (/api/users)"]
+    
+    Router --> Controller["7. User Controller (CRUD Logic)"]
+    Controller --> Resp200["✅ 200/201 JSON Response"]
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## ✨ Features & Security Layers
+
+| Security Layer | Technology / Implementation | Purpose |
+| :--- | :--- | :--- |
+| **Rate Limiting** | [`express-rate-limit`](https://www.npmjs.com/package/express-rate-limit) | Prevents brute-force, scraping, and DDoS attacks (100 req / 15 min). |
+| **Bot & Scanner Blocker** | Regex Blocklist (`middleware/user.js`) | Rejects malicious scrapers (`sqlmap`, `nmap`, `python-requests`, etc.). |
+| **Audit Logging** | File I/O Logger (`utils/logger.js`) | Automatically logs every client's `User-Agent` to `userAgent.json`. |
+| **Token Authentication** | Custom Middleware (`isValid`) | Protects endpoints via query authentication (`?token=123`). |
+| **CORS Protection** | [`cors`](https://www.npmjs.com/package/cors) | Controls cross-origin resource access. |
+| **Error Handling** | Global Handlers | Graceful JSON responses for 400, 401, 403, 404, 429, and 500. |
+
+---
+
+## 📂 Project Directory Structure
+
+```plaintext
+API-Part-2/
+├── controllers/
+│   └── userControllers.js   # Business logic, CRUD operations, & mock dataset
+├── middleware/
+│   └── user.js              # Token validator & Bot-blocking User-Agent middleware
+├── router/
+│   └── user.js              # Express routing definitions
+├── utils/
+│   └── logger.js            # User-Agent persistence utility
+├── userAgent.json           # Log file tracking all incoming request clients
+├── app.js                   # Application bootstrap, security layers, & server entry
+├── package.json             # NPM dependencies, metadata, and scripts
+├── .gitignore               # Excluded files (node_modules, environment files)
+└── README.md                # Comprehensive documentation
+```
+
+---
+
+## 🛠️ Tech Stack & Dependencies
 
 - **Runtime**: [Node.js](https://nodejs.org/) (v18+)
 - **Framework**: [Express.js](https://expressjs.com/) (v5.x)
-- **Architecture**: REST API / MVC
+- **Rate Limiting**: `express-rate-limit` (v8.x)
+- **CORS Handling**: `cors` (v2.x)
+- **Development Tool**: `nodemon` (v3.x)
 
 ---
 
@@ -51,164 +76,75 @@ API-Part-2/
 
 ### Prerequisites
 
-Ensure you have [Node.js](https://nodejs.org/) installed on your machine.
-
+Make sure you have **Node.js** and **npm** installed:
 ```bash
 node -v
 npm -v
 ```
 
-### 1. Clone the Repository
+### 1. Installation
 
+Clone repository and install dependencies:
 ```bash
 git clone <repository-url>
 cd API-Part-2
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
 ```
 
-### 3. Start the Server
+### 2. Running the Server
 
-**Production mode:**
-```bash
-npm start
-```
-
-**Development mode (Auto-restart with Nodemon):**
+#### Development Mode (Auto-restart on file save):
 ```bash
 npm run dev
 ```
 
-The server will start at: **`http://localhost:3000`**
+#### Production Mode:
+```bash
+npm start
+```
+
+The server will be available at: **`http://localhost:3000`**
 
 ---
 
 ## 📡 API Endpoints
 
-**Base URL**: `http://localhost:3000`
+> **Note**: All user endpoints require the authentication query parameter: **`?token=123`**
 
-| Method | Endpoint | Description | Request Body |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/` | Health check / Welcome message | None |
-| **GET** | `/api/users` | Get list of all users | None |
-| **GET** | `/api/users/:id` | Get user by ID | None |
-| **POST** | `/api/users` | Create a new user | JSON (`name`, `email`, `role`) |
-| **PUT** | `/api/users/:id` | Update existing user by ID | JSON (`name`, `email`, `role`) |
-| **DELETE** | `/api/users/:id` | Delete user by ID | None |
+| Method | Endpoint | Description | Request Body | Auth Required |
+| :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/` | Health check / Server status | None | No |
+| **GET** | `/api/users?token=123` | Retrieve all users | None | Yes |
+| **GET** | `/api/users/:id?token=123` | Retrieve user by ID | None | Yes |
+| **POST** | `/api/users?token=123` | Create a new user | JSON (`name`, `email`, `role`) | Yes |
+| **PUT** | `/api/users/:id?token=123` | Update user by ID | JSON (`name`, `email`, `role`) | Yes |
+| **DELETE**| `/api/users/:id?token=123` | Delete user by ID | None | Yes |
 
 ---
 
 ## 🧪 Request & Response Examples
 
-### 1. Get All Users
-- **Request**: `GET http://localhost:3000/users`
-- **Response** (`200 OK`):
-```json
+### 1. Successful User Creation (`POST /api/users?token=123`)
+
+**Request:**
+```http
+POST http://localhost:3000/api/users?token=123
+Content-Type: application/json
+
 {
-  "success": true,
-  "total": 4,
-  "data": [
-    {
-      "id": 1,
-      "name": "Aftab Farhan",
-      "email": "farhan@example.com",
-      "role": "admin"
-    },
-    {
-      "id": 2,
-      "name": "Rahim Ahmed",
-      "email": "rahim@example.com",
-      "role": "user"
-    }
-  ]
+  "name": "Aftab Farhan",
+  "email": "farhan@example.com",
+  "role": "admin"
 }
 ```
 
----
-
-### 2. Get User By ID
-- **Request**: `GET http://localhost:3000/users/1`
-- **Response** (`200 OK`):
-```json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "name": "Aftab Farhan",
-    "email": "farhan@example.com",
-    "role": "admin"
-  }
-}
-```
-
----
-
-### 3. Create User
-- **Request**: `POST http://localhost:3000/users`
-- **Headers**: `Content-Type: application/json`
-- **Body**:
-```json
-{
-  "name": "Tanvir Hasan",
-  "email": "tanvir@example.com",
-  "role": "user"
-}
-```
-- **Response** (`201 Created`):
+**Response (`201 Created`):**
 ```json
 {
   "success": true,
   "message": "User created successfully",
   "data": {
     "id": 5,
-    "name": "Tanvir Hasan",
-    "email": "tanvir@example.com",
-    "role": "user"
-  }
-}
-```
-
----
-
-### 4. Update User
-- **Request**: `PUT http://localhost:3000/users/1`
-- **Headers**: `Content-Type: application/json`
-- **Body**:
-```json
-{
-  "name": "Aftab Farhan (Updated)",
-  "role": "superadmin"
-}
-```
-- **Response** (`200 OK`):
-```json
-{
-  "success": true,
-  "message": "User updated successfully",
-  "data": {
-    "id": 1,
-    "name": "Aftab Farhan (Updated)",
-    "email": "farhan@example.com",
-    "role": "superadmin"
-  }
-}
-```
-
----
-
-### 5. Delete User
-- **Request**: `DELETE http://localhost:3000/users/1`
-- **Response** (`200 OK`):
-```json
-{
-  "success": true,
-  "message": "User deleted successfully",
-  "data": {
-    "id": 1,
     "name": "Aftab Farhan",
     "email": "farhan@example.com",
     "role": "admin"
@@ -218,18 +154,73 @@ The server will start at: **`http://localhost:3000`**
 
 ---
 
-## ⚠️ Error Handling
+### 2. Rate Limit Exceeded (`429 Too Many Requests`)
+Triggered if an IP exceeds **100 requests within 15 minutes**:
 
-- **400 Bad Request**: When required fields (`name`, `email`) are missing in `POST` requests.
-- **404 Not Found**: When requesting a user ID or route that does not exist.
-- **500 Internal Server Error**: Unhandled server exceptions.
-
-Example Error Response:
 ```json
 {
   "success": false,
-  "message": "User not found"
+  "message": "Too many requests from this IP, please try again after 15 minutes"
 }
+```
+
+---
+
+### 3. Malicious Bot Blocked (`403 Forbidden`)
+Triggered if the `User-Agent` matches patterns like `python-requests`, `sqlmap`, `nmap`, etc.:
+
+```json
+{
+  "success": false,
+  "message": "Access Denied: Your client is blocked"
+}
+```
+
+---
+
+### 4. Missing / Invalid Token (`401 Unauthorized`)
+Triggered if `?token=123` is missing:
+
+```json
+{
+  "message": "Unauthorized: Invalid token"
+}
+```
+
+---
+
+## 🛡️ Security Implementation Details
+
+### Rate Limiter Configuration (`app.js`)
+```javascript
+const { rateLimit } = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15-minute window
+  limit: 100,               // Max 100 requests per IP
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests from this IP, please try again after 15 minutes",
+  },
+});
+
+app.use(limiter);
+```
+
+### Bot Blocker Regex List (`middleware/user.js`)
+```javascript
+const blockedPatterns = [
+  /python-requests/i,
+  /Go-http-client/i,
+  /Java/i,
+  /sqlmap/i,
+  /nmap/i,
+  /Nikto/i,
+  /HeadlessChrome/i,
+  /PhantomJS/i,
+];
 ```
 
 ---
