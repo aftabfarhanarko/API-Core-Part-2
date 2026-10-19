@@ -1,663 +1,634 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Traffic & Security Analytics Dashboard</title>
+  <title>API Traffic & Security Analytics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Chart.js for visualization -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: rgba(23, 31, 51, 0.7);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --success: #10b981;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --bg: #f5f6f8;
+      --surface: #fff;
+      --line: #e4e7ec;
+      --line-soft: #eff1f4;
+      --ink: #0f1b2d;
+      --text: #1c2535;
+      --muted: #667085;
+      --primary: #2540c8;
+      --ok: #0b7a5a;
+      --bad: #b4332e;
+      --warn: #a15c07;
+      --ok-bg: #e6f4ef;
+      --bad-bg: #fbeceb;
+      --pri-bg: #eaeefc;
+      --shadow: 0 1px 2px rgba(15, 27, 45, .04), 0 12px 28px -16px rgba(15, 27, 45, .12);
+      --sans: 'Geist', system-ui, -apple-system, sans-serif;
+      --mono: 'Geist Mono', ui-monospace, Menlo, monospace;
+      --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
-      padding: 0;
+      padding: 0
     }
 
     body {
-      background-color: var(--bg);
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%);
+      background: var(--bg);
       color: var(--text);
-      font-family: var(--font);
-      min-height: 100vh;
-      padding: 2rem;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.55;
+      padding: 2.5rem 2rem 3rem;
+      -webkit-font-smoothing: antialiased
     }
 
     .container {
-      max-width: 1320px;
-      margin: 0 auto;
+      max-width: 1240px;
+      margin: 0 auto
     }
 
-    /* Header */
+    code {
+      font-family: var(--mono);
+      font-size: .88em;
+      background: var(--line-soft);
+      padding: .08em .4em;
+      border-radius: 4px
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px
+    }
+
     header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
+      align-items: flex-end;
+      gap: 1.5rem;
       flex-wrap: wrap;
-      gap: 1rem;
+      margin-bottom: 2rem
     }
 
-    .header-title h1 {
-      font-size: 1.85rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #fff 40%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    header h1 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 2.4rem;
+      line-height: 1.1;
+      letter-spacing: -.015em;
+      color: var(--ink)
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: .4rem
+    }
+
+    .actions {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: .75rem
     }
 
-    .header-title p {
-      color: var(--text-muted);
-      font-size: 0.92rem;
-      margin-top: 0.25rem;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .btn {
-      background: var(--card-bg);
-      color: var(--text);
-      border: 1px solid var(--card-border);
-      padding: 0.6rem 1.1rem;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
+    .status {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(8px);
+      gap: .5rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: .3rem .8rem;
+      font-size: .82rem;
+      font-weight: 500;
+      box-shadow: var(--shadow)
     }
 
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .badge-live {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 9999px;
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--success);
-      font-size: 0.8rem;
-      font-weight: 600;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .pulse-dot {
+    .dot {
       width: 7px;
       height: 7px;
-      background: var(--success);
       border-radius: 50%;
-      box-shadow: 0 0 8px var(--success);
-      animation: pulse 1.6s infinite;
+      background: var(--ok);
+      box-shadow: 0 0 0 3px var(--ok-bg);
+      animation: pulse 2.4s infinite
     }
 
     @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(1.3); }
-      100% { opacity: 1; transform: scale(1); }
+      50% {
+        opacity: .4
+      }
     }
 
-    /* KPI Grid */
-    .kpi-grid {
+    @media (prefers-reduced-motion:reduce) {
+      .dot {
+        animation: none
+      }
+
+      .bar-fill,
+      .split span {
+        transition: none !important
+      }
+    }
+
+    .btn {
+      background: var(--ink);
+      color: #fff;
+      border: 1px solid var(--ink);
+      padding: .5rem 1.1rem;
+      border-radius: 8px;
+      font: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 1px 2px rgba(15, 27, 45, .2);
+      transition: background .15s
+    }
+
+    .btn:hover {
+      background: #1d2c47
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: wait
+    }
+
+    .kpis {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2rem;
-    }
-
-    .kpi-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
       border-radius: 14px;
-      padding: 1.35rem;
-      backdrop-filter: blur(12px);
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem
     }
 
-    .kpi-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.15);
+    @media(max-width:900px) {
+      .kpis {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .kpi-hero {
+        grid-column: 1/-1
+      }
     }
 
-    .kpi-card .kpi-label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    @media(max-width:520px) {
+      .kpis {
+        grid-template-columns: 1fr
+      }
     }
 
-    .kpi-card .kpi-val {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-top: 0.4rem;
-      display: flex;
-      align-items: baseline;
-      gap: 0.4rem;
+    .kpi {
+      background: var(--surface);
+      padding: 1.4rem 1.5rem
     }
 
-    .val-allowed { color: var(--success); }
-    .val-blocked { color: var(--danger); }
-    .val-neutral { color: #38bdf8; }
-    .val-warn { color: var(--warning); }
+    .kpi-label {
+      color: var(--muted);
+      font-weight: 500
+    }
+
+    .kpi-val {
+      font-family: var(--serif);
+      font-size: 2.6rem;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin-top: .35rem;
+      font-variant-numeric: tabular-nums
+    }
+
+    .kpi-hero .kpi-val {
+      font-size: 3.6rem;
+      color: var(--ink)
+    }
 
     .kpi-sub {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.35rem;
+      color: var(--muted);
+      font-size: .82rem;
+      margin-top: .2rem
     }
 
-    /* Charts Grid */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+    .v-ok {
+      color: var(--ok)
     }
 
-    @media (max-width: 640px) {
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
+    .v-bad {
+      color: var(--bad)
     }
 
-    .chart-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+    .v-warn {
+      color: var(--warn)
+    }
+
+    .split {
+      display: flex;
+      gap: 2px;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      background: var(--line-soft);
+      margin: 1.1rem 0 .7rem
+    }
+
+    .split span {
+      height: 100%;
+      transition: width .8s ease
+    }
+
+    .s-ok {
+      background: var(--ok)
+    }
+
+    .s-bad {
+      background: var(--bad)
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
       border-radius: 14px;
-      padding: 1.4rem;
-      backdrop-filter: blur(12px);
+      padding: 1.5rem;
+      box-shadow: var(--shadow)
     }
 
-    .chart-card h3 {
-      font-size: 1.05rem;
+    .card h3 {
+      font-size: 1rem;
       font-weight: 600;
-      margin-bottom: 0.2rem;
+      color: var(--ink);
+      letter-spacing: -.005em
     }
 
-    .chart-card p {
-      color: var(--text-muted);
-      font-size: 0.82rem;
-      margin-bottom: 1.2rem;
+    .card .desc {
+      color: var(--muted);
+      font-size: .85rem;
+      margin: .15rem 0 1.25rem
     }
 
-    .chart-wrapper {
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem
+    }
+
+    .chart-wrap {
       position: relative;
-      height: 270px;
-      width: 100%;
+      height: 260px
     }
 
-    /* Interactive DOM Bar Chart Section */
-    .dom-bars-container {
+    .bars {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      margin-top: 0.8rem;
+      gap: 1.1rem
     }
 
-    .dom-bar-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      padding: 0.6rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      transition: background 0.2s ease;
-    }
-
-    .dom-bar-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .dom-bar-info {
+    .bar-info {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-    }
-
-    .dom-bar-name {
-      font-weight: 600;
-      color: #e2e8f0;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .dom-bar-stats {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .dom-bar-track {
-      background: rgba(255, 255, 255, 0.06);
-      height: 12px;
-      border-radius: 9999px;
-      overflow: hidden;
-      width: 100%;
-    }
-
-    .dom-bar-fill {
-      height: 100%;
-      border-radius: 9999px;
-      transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Search & Filter Controls */
-    .filter-bar {
-      display: flex;
-      gap: 0.6rem;
-      margin-bottom: 1rem;
+      gap: 1rem;
       flex-wrap: wrap;
+      margin-bottom: .4rem
     }
 
-    .search-input {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      padding: 0.5rem 0.85rem;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-family: inherit;
-      outline: none;
-      flex: 1;
-      min-width: 180px;
-      transition: border-color 0.2s ease;
+    .bar-name {
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      min-width: 0;
+      word-break: break-all
     }
 
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    .swatch {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex: none
     }
 
-    /* Tables Section */
-    .tables-section {
+    .bar-stats {
+      color: var(--muted);
+      font-size: .82rem;
+      font-variant-numeric: tabular-nums
+    }
+
+    .bar-track {
+      background: var(--line-soft);
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .7s ease
+    }
+
+    .tables {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+      gap: 1.5rem
     }
 
-    @media (max-width: 1024px) {
-      .tables-section {
-        grid-template-columns: 1fr;
+    @media(max-width:1024px) {
+      .tables {
+        grid-template-columns: 1fr
       }
     }
 
-    .table-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 1.4rem;
-      backdrop-filter: blur(12px);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .table-header {
+    .t-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
+      gap: .5rem
     }
 
-    .table-header h3 {
-      font-size: 1.05rem;
-      font-weight: 600;
+    .t-head h3 {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: .55rem
     }
 
-    .table-count-badge {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 0.2rem 0.6rem;
-      border-radius: 12px;
-      font-size: 0.76rem;
-      color: var(--text-muted);
-      font-weight: 600;
+    .count {
+      background: var(--line-soft);
+      color: var(--muted);
+      padding: .1rem .65rem;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 500
     }
 
-    .table-wrap {
-      overflow-x: auto;
-      max-height: 420px;
-      overflow-y: auto;
+    .search {
+      width: 100%;
+      background: #fafbfc;
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: .55rem .85rem;
       border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      font: inherit;
+      margin-bottom: 1rem;
+      transition: border-color .15s, box-shadow .15s
+    }
+
+    .search::placeholder {
+      color: #98a2b3
+    }
+
+    .search:focus {
+      background: #fff;
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37, 64, 200, .14)
+    }
+
+    .t-wrap {
+      overflow: auto;
+      max-height: 420px;
+      border: 1px solid var(--line);
+      border-radius: 10px
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      text-align: left;
-      font-size: 0.85rem;
+      text-align: left
     }
 
     thead th {
       position: sticky;
       top: 0;
-      background: #121827;
-      color: var(--text-muted);
-      padding: 0.75rem 0.8rem;
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--card-border);
+      background: #fafbfc;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: .78rem;
+      padding: .7rem .9rem;
+      border-bottom: 1px solid var(--line);
       cursor: pointer;
       user-select: none;
+      white-space: nowrap
     }
 
     thead th:hover {
-      color: var(--text);
+      color: var(--ink)
     }
 
     tbody td {
-      padding: 0.75rem 0.8rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      color: #cbd5e1;
+      padding: .8rem .9rem;
+      border-bottom: 1px solid var(--line-soft)
     }
 
-    tbody tr {
-      transition: background 0.15s ease;
+    tbody tr:last-child td {
+      border-bottom: 0
     }
 
     tbody tr:hover {
-      background: rgba(255, 255, 255, 0.04);
+      background: #fafbfc
+    }
+
+    .mono {
+      font-family: var(--mono);
+      font-size: .8rem
+    }
+
+    .ua {
+      max-width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--muted)
     }
 
     .pill {
       display: inline-block;
-      padding: 0.2rem 0.55rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .pill-count {
-      background: rgba(59, 130, 246, 0.15);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    .pill-danger {
-      background: rgba(239, 68, 68, 0.15);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .ua-text {
-      max-width: 250px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-family: monospace;
-      font-size: 0.8rem;
-    }
-
-    .empty-state {
+      min-width: 2rem;
       text-align: center;
-      padding: 2.5rem 1rem;
-      color: var(--text-muted);
-      font-size: 0.9rem;
+      padding: .12rem .55rem;
+      border-radius: 6px;
+      font-size: .78rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums
+    }
+
+    .pill-ok {
+      background: var(--pri-bg);
+      color: var(--primary)
+    }
+
+    .pill-bad {
+      background: var(--bad-bg);
+      color: var(--bad)
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: .8rem
+    }
+
+    .empty {
+      text-align: center;
+      padding: 2.25rem 1rem;
+      color: var(--muted)
     }
 
     footer {
       text-align: center;
-      margin-top: 3rem;
-      color: var(--text-muted);
-      font-size: 0.84rem;
+      margin-top: 2.5rem;
+      color: var(--muted);
+      font-size: .82rem
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <!-- Header -->
     <header>
-      <div class="header-title">
-        <h1>📊 Traffic & Security Analytics</h1>
-        <p>Live DOM-driven dashboard rendering data from <code>userAgent.json</code> & <code>blocked.json</code></p>
+      <div>
+        <h1>Traffic &amp; security analytics</h1>
+        <p>Data from <code>userAgent.json</code> and <code>blocked.json</code>, refreshed every 5 seconds</p>
       </div>
-      <div class="header-actions">
-        <span class="badge-live">
-          <span class="pulse-dot"></span> Live Monitoring
-        </span>
-        <button class="btn btn-primary" id="btnRefresh">
-          🔄 Refresh Now
-        </button>
+      <div class="actions">
+        <span class="status"><span class="dot"></span>Live</span>
+        <button class="btn" id="btnRefresh">Refresh now</button>
       </div>
     </header>
 
-    <!-- KPI Cards (DOM Updated) -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Allowed Hits</div>
-        <div class="kpi-val val-allowed" id="totalAllowedHits">0</div>
-        <div class="kpi-sub" id="allowedClientsCount">0 Unique Clients</div>
+    <section class="kpis">
+      <div class="kpi kpi-hero">
+        <div class="kpi-label">Total requests</div>
+        <div class="kpi-val" id="grandTotalHits">0</div>
+        <div class="split" aria-hidden="true"><span class="s-ok" id="splitAllowed" style="width:0"></span><span
+            class="s-bad" id="splitBlocked" style="width:0"></span></div>
+        <div class="kpi-sub">Allowed and blocked, across all clients</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Blocked Attacks</div>
-        <div class="kpi-val val-blocked" id="totalBlockedHits">0</div>
-        <div class="kpi-sub" id="blockedBotsCount">0 Unique Bots / Scanners</div>
+      <div class="kpi">
+        <div class="kpi-label">Allowed</div>
+        <div class="kpi-val v-ok" id="totalAllowedHits">0</div>
+        <div class="kpi-sub" id="allowedClientsCount">0 unique clients</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Block Rate</div>
-        <div class="kpi-val val-warn" id="blockPercentage">0%</div>
-        <div class="kpi-sub">Of total incoming requests</div>
+      <div class="kpi">
+        <div class="kpi-label">Blocked</div>
+        <div class="kpi-val v-bad" id="totalBlockedHits">0</div>
+        <div class="kpi-sub" id="blockedBotsCount">0 unique bots</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Total Traffic</div>
-        <div class="kpi-val val-neutral" id="grandTotalHits">0</div>
-        <div class="kpi-sub">Recorded across all clients</div>
+      <div class="kpi">
+        <div class="kpi-label">Block rate</div>
+        <div class="kpi-val v-warn" id="blockPercentage">0%</div>
+        <div class="kpi-sub">Share of all requests</div>
       </div>
-    </div>
+    </section>
 
-    <!-- Charts Section -->
-    <div class="charts-grid">
-      <!-- Chart 1: Comparison Bar Chart (Chart.js) -->
-      <div class="chart-card">
-        <h3>Allowed vs Blocked Traffic (Chart.js)</h3>
-        <p>Comparison between legitimate client hits and blocked bot attempts</p>
-        <div class="chart-wrapper">
-          <canvas id="trafficBarChart"></canvas>
+    <section class="charts">
+      <div class="card">
+        <h3>Allowed vs blocked requests</h3>
+        <p class="desc">Legitimate client hits compared with blocked attempts</p>
+        <div class="chart-wrap"><canvas id="trafficBarChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Allowed requests by client</h3>
+        <p class="desc">Share of hits per client type</p>
+        <div class="chart-wrap"><canvas id="clientDonutChart"></canvas></div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:1.5rem">
+      <h3>Client breakdown</h3>
+      <p class="desc">Hits per user agent, as a share of allowed requests</p>
+      <div class="bars" id="domBarsList">
+        <div class="empty">Loading clients…</div>
+      </div>
+    </section>
+
+    <section class="tables">
+      <div class="card">
+        <div class="t-head">
+          <h3><span class="swatch" style="background:var(--ok)"></span>Allowed clients</h3>
+          <span class="count" id="allowedTableCount">0 clients</span>
         </div>
-      </div>
-
-      <!-- Chart 2: Client Breakdown (Chart.js) -->
-      <div class="chart-card">
-        <h3>Client Distribution (Doughnut)</h3>
-        <p>Proportion of Thunder Client, Postman, Browsers, and Scanners</p>
-        <div class="chart-wrapper">
-          <canvas id="clientDonutChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Interactive Pure DOM Bar Chart Section -->
-    <div class="chart-card" style="margin-bottom: 2rem;">
-      <h3>⚡ Client Breakdown (DOM-Generated Progress Bars)</h3>
-      <p>Direct DOM manipulation dynamically creating visual progress bars for each User-Agent</p>
-      
-      <!-- Container where DOM elements will be injected dynamically -->
-      <div class="dom-bars-container" id="domBarsList">
-        <div class="empty-state">Loading client breakdown...</div>
-      </div>
-    </div>
-
-    <!-- Tables Section -->
-    <div class="tables-section">
-      <!-- Allowed Requests Table (userAgent.json) -->
-      <div class="table-card">
-        <div class="table-header">
-          <h3>
-            <span style="color: var(--success);">●</span> Allowed Clients (<code>userAgent.json</code>)
-          </h3>
-          <span class="table-count-badge" id="allowedTableCount">0 items</span>
-        </div>
-
-        <!-- Filter Input with DOM Event Listener -->
-        <div class="filter-bar">
-          <input 
-            type="text" 
-            id="searchAllowedInput" 
-            class="search-input" 
-            placeholder="🔍 Filter allowed clients by IP or User-Agent..."
-          />
-        </div>
-
-        <div class="table-wrap">
+        <input type="text" id="searchAllowedInput" class="search" placeholder="Filter by IP or user agent"
+          aria-label="Filter allowed clients">
+        <div class="t-wrap">
           <table>
             <thead>
               <tr>
-                <th onclick="sortTable('allowed', 'ip')">IP Address ↕</th>
-                <th onclick="sortTable('allowed', 'userAgent')">Client User-Agent ↕</th>
-                <th onclick="sortTable('allowed', 'count')">Hits ↕</th>
-                <th onclick="sortTable('allowed', 'lastHit')">Last Seen ↕</th>
+                <th onclick="sortTable('allowed','ip')">IP address ↕</th>
+                <th onclick="sortTable('allowed','userAgent')">User agent ↕</th>
+                <th onclick="sortTable('allowed','count')">Hits ↕</th>
+                <th onclick="sortTable('allowed','lastHit')">Last seen ↕</th>
               </tr>
             </thead>
             <tbody id="allowedTableBody">
-              <tr><td colspan="4" class="empty-state">Loading allowed clients...</td></tr>
+              <tr>
+                <td colspan="4" class="empty">Loading clients…</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Blocked Requests Table (blocked.json) -->
-      <div class="table-card">
-        <div class="table-header">
-          <h3>
-            <span style="color: var(--danger);">●</span> Blocked Bots (<code>blocked.json</code>)
-          </h3>
-          <span class="table-count-badge" id="blockedTableCount">0 items</span>
+      <div class="card">
+        <div class="t-head">
+          <h3><span class="swatch" style="background:var(--bad)"></span>Blocked bots</h3>
+          <span class="count" id="blockedTableCount">0 bots</span>
         </div>
-
-        <!-- Filter Input with DOM Event Listener -->
-        <div class="filter-bar">
-          <input 
-            type="text" 
-            id="searchBlockedInput" 
-            class="search-input" 
-            placeholder="🔍 Filter blocked bots by IP, name or reason..."
-          />
-        </div>
-
-        <div class="table-wrap">
+        <input type="text" id="searchBlockedInput" class="search" placeholder="Filter by IP, bot or reason"
+          aria-label="Filter blocked bots">
+        <div class="t-wrap">
           <table>
             <thead>
               <tr>
-                <th onclick="sortTable('blocked', 'ip')">IP Address ↕</th>
-                <th onclick="sortTable('blocked', 'userAgent')">Blocked Bot ↕</th>
-                <th onclick="sortTable('blocked', 'count')">Attempts ↕</th>
-                <th onclick="sortTable('blocked', 'reason')">Reason / Pattern ↕</th>
+                <th onclick="sortTable('blocked','ip')">IP address ↕</th>
+                <th onclick="sortTable('blocked','userAgent')">Bot ↕</th>
+                <th onclick="sortTable('blocked','count')">Attempts ↕</th>
+                <th onclick="sortTable('blocked','reason')">Reason ↕</th>
               </tr>
             </thead>
             <tbody id="blockedTableBody">
-              <tr><td colspan="4" class="empty-state">No blocked bots recorded yet 👍</td></tr>
+              <tr>
+                <td colspan="4" class="empty">No blocked bots recorded yet.</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div>
+    </section>
 
-    <footer>
-      User Management API • Live DOM Analytics from <code>userAgent.json</code> & <code>blocked.json</code>
-    </footer>
+    <footer>User Management API · Analytics from <code>userAgent.json</code> and <code>blocked.json</code></footer>
   </div>
 
-  <!-- DOM MANIPULATION SCRIPT -->
   <script>
-    // State Store
-    let rawAllowedData = [];
-    let rawBlockedData = [];
-    let barChartInstance = null;
-    let donutChartInstance = null;
-    let sortState = {
-      allowed: { col: 'count', asc: false },
-      blocked: { col: 'count', asc: false }
-    };
+    let rawAllowedData = [], rawBlockedData = [], barChartInstance = null, donutChartInstance = null;
+    const sortState = { allowed: { col: 'count', asc: false }, blocked: { col: 'count', asc: false } };
+    const $ = id => document.getElementById(id);
+    const btnRefresh = $('btnRefresh'), domBarsList = $('domBarsList'),
+      allowedTableBody = $('allowedTableBody'), blockedTableBody = $('blockedTableBody'),
+      searchAllowedInput = $('searchAllowedInput'), searchBlockedInput = $('searchBlockedInput');
 
-    // DOM Elements
-    const btnRefresh = document.getElementById('btnRefresh');
-    const totalAllowedEl = document.getElementById('totalAllowedHits');
-    const totalBlockedEl = document.getElementById('totalBlockedHits');
-    const allowedClientsCountEl = document.getElementById('allowedClientsCount');
-    const blockedBotsCountEl = document.getElementById('blockedBotsCount');
-    const grandTotalEl = document.getElementById('grandTotalHits');
-    const blockPercentageEl = document.getElementById('blockPercentage');
-
-    const domBarsList = document.getElementById('domBarsList');
-    const allowedTableBody = document.getElementById('allowedTableBody');
-    const blockedTableBody = document.getElementById('blockedTableBody');
-    const allowedTableCount = document.getElementById('allowedTableCount');
-    const blockedTableCount = document.getElementById('blockedTableCount');
-
-    const searchAllowedInput = document.getElementById('searchAllowedInput');
-    const searchBlockedInput = document.getElementById('searchBlockedInput');
-
-    // Attach Event Listeners (DOM Event Manipulation)
     btnRefresh.addEventListener('click', fetchAnalytics);
     searchAllowedInput.addEventListener('input', () => renderAllowedTable(getFilteredAllowed()));
     searchBlockedInput.addEventListener('input', () => renderBlockedTable(getFilteredBlocked()));
 
-    /**
-     * 1. Fetch JSON data from server (/api/analytics)
-     */
+    const sum = list => list.reduce((s, i) => s + (i.count || 0), 0);
+
     async function fetchAnalytics() {
-      btnRefresh.innerText = '⏳ Loading...';
+      btnRefresh.textContent = 'Loading…';
       btnRefresh.disabled = true;
-
       try {
-        // Automatically connect to Express server on port 3000 if opened with VS Code Live Server
-        const API_BASE = (window.location.port !== '3000') ? 'http://localhost:3000' : '';
-        const response = await fetch(`${API_BASE}/api/analytics`);
-        const json = await response.json();
-
+        const API_BASE = window.location.port !== '3000' ? 'http://localhost:3000' : '';
+        const json = await (await fetch(`${API_BASE}/api/analytics`)).json();
         if (json.success && json.data) {
           rawAllowedData = json.data.allowed || [];
           rawBlockedData = json.data.blocked || [];
-
-          // Perform DOM Updates
           updateKpis();
           renderDomBars();
           renderAllowedTable(getFilteredAllowed());
@@ -665,323 +636,175 @@
           renderCharts();
         }
       } catch (err) {
-        console.error('DOM Analytics Fetch Error:', err);
+        console.error('Analytics fetch error:', err);
       } finally {
-        btnRefresh.innerText = '🔄 Refresh Now';
+        btnRefresh.textContent = 'Refresh now';
         btnRefresh.disabled = false;
       }
     }
 
-    /**
-     * 2. DOM Manipulation: Update KPI Stats & Text
-     */
     function updateKpis() {
-      const totalAllowed = rawAllowedData.reduce((sum, item) => sum + (item.count || 0), 0);
-      const totalBlocked = rawBlockedData.reduce((sum, item) => sum + (item.count || 0), 0);
-      const grandTotal = totalAllowed + totalBlocked;
-      const blockPct = grandTotal > 0 ? ((totalBlocked / grandTotal) * 100).toFixed(1) : 0;
-
-      // Updating DOM Node text
-      totalAllowedEl.textContent = totalAllowed.toLocaleString();
-      allowedClientsCountEl.textContent = `${rawAllowedData.length} Unique Clients`;
-
-      totalBlockedEl.textContent = totalBlocked.toLocaleString();
-      blockedBotsCountEl.textContent = `${rawBlockedData.length} Unique Bots/Scanners`;
-
-      grandTotalEl.textContent = grandTotal.toLocaleString();
-      blockPercentageEl.textContent = `${blockPct}%`;
+      const a = sum(rawAllowedData), b = sum(rawBlockedData), total = a + b;
+      $('totalAllowedHits').textContent = a.toLocaleString();
+      $('allowedClientsCount').textContent = `${rawAllowedData.length} unique clients`;
+      $('totalBlockedHits').textContent = b.toLocaleString();
+      $('blockedBotsCount').textContent = `${rawBlockedData.length} unique bots`;
+      $('grandTotalHits').textContent = total.toLocaleString();
+      const ap = total > 0 ? (a / total) * 100 : 0;
+      $('splitAllowed').style.width = `${ap}%`;
+      $('splitBlocked').style.width = `${total > 0 ? 100 - ap : 0}%`;
+      $('blockPercentage').textContent = `${total > 0 ? ((b / total) * 100).toFixed(1) : 0}%`;
     }
 
-    /**
-     * 3. DOM Manipulation: Dynamic Client Breakdown Bars (pure JS DOM elements)
-     */
     function renderDomBars() {
-      domBarsList.innerHTML = ''; // Clear previous elements
-
-      const totalAllowed = rawAllowedData.reduce((sum, item) => sum + (item.count || 0), 0);
-
-      if (rawAllowedData.length === 0) {
-        const emptyDiv = document.createElement('div');
-        emptyDiv.className = 'empty-state';
-        emptyDiv.textContent = 'No client hits recorded in userAgent.json';
-        domBarsList.appendChild(emptyDiv);
+      domBarsList.innerHTML = '';
+      const total = sum(rawAllowedData);
+      if (!rawAllowedData.length) {
+        domBarsList.innerHTML = '<div class="empty">No client hits recorded in userAgent.json.</div>';
         return;
       }
-
-      // Sort by count descending
-      const sorted = [...rawAllowedData].sort((a, b) => (b.count || 0) - (a.count || 0));
-
-      sorted.forEach(item => {
-        const pct = totalAllowed > 0 ? (((item.count || 0) / totalAllowed) * 100).toFixed(1) : 0;
-
-        // Dynamically creating DOM nodes using document.createElement
-        const barItem = document.createElement('div');
-        barItem.className = 'dom-bar-item';
-
-        const barInfo = document.createElement('div');
-        barInfo.className = 'dom-bar-info';
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'dom-bar-name';
-        nameSpan.innerHTML = `<span>${getClientIcon(item.userAgent)}</span> <span>${escapeHtml(item.userAgent)}</span>`;
-
-        const statsSpan = document.createElement('span');
-        statsSpan.className = 'dom-bar-stats';
-        statsSpan.textContent = `${item.count || 1} hits (${pct}%) • IP: ${item.ip || '127.0.0.1'}`;
-
-        barInfo.appendChild(nameSpan);
-        barInfo.appendChild(statsSpan);
-
-        const trackDiv = document.createElement('div');
-        trackDiv.className = 'dom-bar-track';
-
-        const fillDiv = document.createElement('div');
-        fillDiv.className = 'dom-bar-fill';
-        fillDiv.style.width = `${pct}%`;
-        fillDiv.style.background = getClientColor(item.userAgent);
-
-        trackDiv.appendChild(fillDiv);
-        barItem.appendChild(barInfo);
-        barItem.appendChild(trackDiv);
-
-        // Append to DOM
-        domBarsList.appendChild(barItem);
+      [...rawAllowedData].sort((a, b) => (b.count || 0) - (a.count || 0)).forEach(item => {
+        const pct = total > 0 ? (((item.count || 0) / total) * 100).toFixed(1) : 0;
+        const color = getClientColor(item.userAgent);
+        const row = document.createElement('div');
+        row.innerHTML = `
+      <div class="bar-info">
+        <span class="bar-name"><span class="swatch" style="background:${color}"></span>${escapeHtml(item.userAgent)}</span>
+        <span class="bar-stats">${item.count || 1} hits (${pct}%) · IP ${escapeHtml(item.ip || '127.0.0.1')}</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+        domBarsList.appendChild(row);
       });
     }
 
-    /**
-     * 4. DOM Manipulation: Render Allowed Clients Table
-     */
     function renderAllowedTable(list) {
       allowedTableBody.innerHTML = '';
-      allowedTableCount.textContent = `${list.length} clients`;
-
-      if (list.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="4" class="empty-state">No matching clients found</td>`;
-        allowedTableBody.appendChild(tr);
+      $('allowedTableCount').textContent = `${list.length} clients`;
+      if (!list.length) {
+        allowedTableBody.innerHTML = '<tr><td colspan="4" class="empty">No matching clients.</td></tr>';
         return;
       }
-
       list.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><span style="font-family: monospace; color: #93c5fd;">${escapeHtml(item.ip || '127.0.0.1')}</span></td>
-          <td><div class="ua-text" title="${escapeHtml(item.userAgent)}">${getClientIcon(item.userAgent)} ${escapeHtml(item.userAgent)}</div></td>
-          <td><span class="pill pill-count">${item.count || 1}</span></td>
-          <td style="font-size: 0.78rem; color: var(--text-muted);">${formatDate(item.lastHit)}</td>
-        `;
+      <td class="mono">${escapeHtml(item.ip || '127.0.0.1')}</td>
+      <td><div class="ua" title="${escapeHtml(item.userAgent)}">${escapeHtml(item.userAgent)}</div></td>
+      <td><span class="pill pill-ok">${item.count || 1}</span></td>
+      <td class="muted">${formatDate(item.lastHit)}</td>`;
         allowedTableBody.appendChild(tr);
       });
     }
 
-    /**
-     * 5. DOM Manipulation: Render Blocked Bots Table
-     */
     function renderBlockedTable(list) {
       blockedTableBody.innerHTML = '';
-      blockedTableCount.textContent = `${list.length} bots`;
-
-      if (list.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="4" class="empty-state">No blocked bots recorded yet 👍</td>`;
-        blockedTableBody.appendChild(tr);
+      $('blockedTableCount').textContent = `${list.length} bots`;
+      if (!list.length) {
+        blockedTableBody.innerHTML = '<tr><td colspan="4" class="empty">No blocked bots recorded yet.</td></tr>';
         return;
       }
-
       list.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><span style="font-family: monospace; color: #fca5a5;">${escapeHtml(item.ip || '127.0.0.1')}</span></td>
-          <td><div class="ua-text" title="${escapeHtml(item.userAgent)}">🛑 ${escapeHtml(item.userAgent)}</div></td>
-          <td><span class="pill pill-danger">${item.count || 1}</span></td>
-          <td style="font-size: 0.75rem; color: #f87171;">${escapeHtml(item.reason || 'Blocked Pattern')}</td>
-        `;
+      <td class="mono">${escapeHtml(item.ip || '127.0.0.1')}</td>
+      <td><div class="ua" title="${escapeHtml(item.userAgent)}">${escapeHtml(item.userAgent)}</div></td>
+      <td><span class="pill pill-bad">${item.count || 1}</span></td>
+      <td class="muted">${escapeHtml(item.reason || 'Blocked pattern')}</td>`;
         blockedTableBody.appendChild(tr);
       });
     }
 
-    /**
-     * 6. DOM Filtering Functions
-     */
     function getFilteredAllowed() {
       const q = searchAllowedInput.value.toLowerCase().trim();
-      let list = rawAllowedData.filter(item => 
-        (item.userAgent && item.userAgent.toLowerCase().includes(q)) ||
-        (item.ip && item.ip.toLowerCase().includes(q))
-      );
-
-      // Sort
+      const list = rawAllowedData.filter(i =>
+        (i.userAgent && i.userAgent.toLowerCase().includes(q)) || (i.ip && i.ip.toLowerCase().includes(q)));
       const { col, asc } = sortState.allowed;
       return list.sort((a, b) => compareValues(a[col], b[col], asc));
     }
 
     function getFilteredBlocked() {
       const q = searchBlockedInput.value.toLowerCase().trim();
-      let list = rawBlockedData.filter(item => 
-        (item.userAgent && item.userAgent.toLowerCase().includes(q)) ||
-        (item.ip && item.ip.toLowerCase().includes(q)) ||
-        (item.reason && item.reason.toLowerCase().includes(q))
-      );
-
-      // Sort
+      const list = rawBlockedData.filter(i =>
+        (i.userAgent && i.userAgent.toLowerCase().includes(q)) ||
+        (i.ip && i.ip.toLowerCase().includes(q)) ||
+        (i.reason && i.reason.toLowerCase().includes(q)));
       const { col, asc } = sortState.blocked;
       return list.sort((a, b) => compareValues(a[col], b[col], asc));
     }
 
-    /**
-     * 7. DOM Sorting Function
-     */
     function sortTable(type, column) {
-      if (sortState[type].col === column) {
-        sortState[type].asc = !sortState[type].asc;
-      } else {
-        sortState[type].col = column;
-        sortState[type].asc = true;
-      }
-
-      if (type === 'allowed') {
-        renderAllowedTable(getFilteredAllowed());
-      } else {
-        renderBlockedTable(getFilteredBlocked());
-      }
+      const s = sortState[type];
+      if (s.col === column) s.asc = !s.asc; else { s.col = column; s.asc = true; }
+      type === 'allowed' ? renderAllowedTable(getFilteredAllowed()) : renderBlockedTable(getFilteredBlocked());
     }
 
     function compareValues(a, b, asc) {
-      if (a === undefined || a === null) a = '';
-      if (b === undefined || b === null) b = '';
-      if (typeof a === 'number' && typeof b === 'number') {
-        return asc ? a - b : b - a;
-      }
+      a = a ?? ''; b = b ?? '';
+      if (typeof a === 'number' && typeof b === 'number') return asc ? a - b : b - a;
       return asc ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
     }
 
-    /**
-     * 8. Render Charts (Chart.js Integration)
-     */
+    const TICK = '#667085', GRID = '#edf0f3';
+    const CLIENT_COLORS = { 'Thunder Client': '#2540c8', 'Postman': '#d9731f', 'cURL': '#0b7a5a', 'Chrome': '#0e7490', 'Firefox': '#b4325a', 'Other': '#8591a3' };
+
+    function clientName(ua) {
+      const low = (ua || '').toLowerCase();
+      if (low.includes('thunder client')) return 'Thunder Client';
+      if (low.includes('postman')) return 'Postman';
+      if (low.includes('curl')) return 'cURL';
+      if (low.includes('chrome')) return 'Chrome';
+      if (low.includes('firefox')) return 'Firefox';
+      return 'Other';
+    }
+    const getClientColor = ua => CLIENT_COLORS[clientName(ua)];
+
     function renderCharts() {
-      const totalAllowed = rawAllowedData.reduce((sum, item) => sum + (item.count || 0), 0);
-      const totalBlocked = rawBlockedData.reduce((sum, item) => sum + (item.count || 0), 0);
-
-      // Bar Chart
-      const barCtx = document.getElementById('trafficBarChart').getContext('2d');
+      Chart.defaults.font.family = "'Geist', system-ui, sans-serif";
       if (barChartInstance) barChartInstance.destroy();
-
-      barChartInstance = new Chart(barCtx, {
+      barChartInstance = new Chart($('trafficBarChart').getContext('2d'), {
         type: 'bar',
         data: {
-          labels: ['Allowed Requests (userAgent.json)', 'Blocked Attacks (blocked.json)'],
-          datasets: [{
-            data: [totalAllowed, totalBlocked],
-            backgroundColor: ['rgba(16, 185, 129, 0.75)', 'rgba(239, 68, 68, 0.75)'],
-            borderColor: ['#10b981', '#ef4444'],
-            borderWidth: 1.5,
-            borderRadius: 8,
-          }]
+          labels: ['Allowed', 'Blocked'],
+          datasets: [{ data: [sum(rawAllowedData), sum(rawBlockedData)], backgroundColor: ['#0b7a5a', '#b4332e'], borderRadius: 6, maxBarThickness: 72 }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#94a3b8' }
-            },
-            x: {
-              grid: { display: false },
-              ticks: { color: '#cbd5e1', font: { weight: '600' } }
-            }
+            y: { beginAtZero: true, grid: { color: GRID }, ticks: { color: TICK } },
+            x: { grid: { display: false }, ticks: { color: '#1c2535', font: { weight: '500' } } }
           }
         }
       });
 
-      // Doughnut Chart
-      const donutCtx = document.getElementById('clientDonutChart').getContext('2d');
       if (donutChartInstance) donutChartInstance.destroy();
-
       const groups = {};
-      rawAllowedData.forEach(item => {
-        let name = 'Other';
-        const ua = (item.userAgent || '').toLowerCase();
-        if (ua.includes('thunder client')) name = 'Thunder Client';
-        else if (ua.includes('postman')) name = 'Postman';
-        else if (ua.includes('curl')) name = 'cURL';
-        else if (ua.includes('chrome')) name = 'Chrome';
-        else if (ua.includes('firefox')) name = 'Firefox';
-        groups[name] = (groups[name] || 0) + (item.count || 1);
-      });
-
-      donutChartInstance = new Chart(donutCtx, {
+      rawAllowedData.forEach(i => { const n = clientName(i.userAgent); groups[n] = (groups[n] || 0) + (i.count || 1); });
+      donutChartInstance = new Chart($('clientDonutChart').getContext('2d'), {
         type: 'doughnut',
         data: {
           labels: Object.keys(groups),
-          datasets: [{
-            data: Object.values(groups),
-            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#64748b'],
-            borderColor: '#0b0f19',
-            borderWidth: 2
-          }]
+          datasets: [{ data: Object.values(groups), backgroundColor: Object.keys(groups).map(n => CLIENT_COLORS[n]), borderColor: '#fff', borderWidth: 2 }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'right',
-              labels: { color: '#cbd5e1', font: { size: 12 } }
-            }
-          }
+          responsive: true, maintainAspectRatio: false, cutout: '62%',
+          plugins: { legend: { position: 'right', labels: { color: '#1c2535', boxWidth: 12, boxHeight: 12 } } }
         }
       });
     }
 
-    // Helper Functions
-    function getClientIcon(ua) {
-      if (!ua) return '🌐';
-      const low = ua.toLowerCase();
-      if (low.includes('thunder client')) return '⚡';
-      if (low.includes('postman')) return '🚀';
-      if (low.includes('curl')) return '💻';
-      if (low.includes('chrome')) return '🌐';
-      if (low.includes('firefox')) return '🦊';
-      return '📡';
-    }
-
-    function getClientColor(ua) {
-      if (!ua) return '#3b82f6';
-      const low = ua.toLowerCase();
-      if (low.includes('thunder client')) return 'linear-gradient(90deg, #3b82f6, #60a5fa)';
-      if (low.includes('postman')) return 'linear-gradient(90deg, #f97316, #fb923c)';
-      if (low.includes('curl')) return 'linear-gradient(90deg, #10b981, #34d399)';
-      if (low.includes('chrome')) return 'linear-gradient(90deg, #06b6d4, #22d3ee)';
-      if (low.includes('firefox')) return 'linear-gradient(90deg, #e11d48, #f43f5e)';
-      return 'linear-gradient(90deg, #6366f1, #818cf8)';
-    }
-
-    function formatDate(isoStr) {
-      if (!isoStr) return 'N/A';
-      try {
-        const d = new Date(isoStr);
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      } catch (e) {
-        return isoStr;
-      }
+    function formatDate(iso) {
+      if (!iso) return 'N/A';
+      const d = new Date(iso);
+      return isNaN(d) ? iso : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
     function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+      return str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '';
     }
 
-    // Initial Fetch & Auto polling every 5s
     fetchAnalytics();
     setInterval(fetchAnalytics, 5000);
   </script>
 </body>
+
 </html>
