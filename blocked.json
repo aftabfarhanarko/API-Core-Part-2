@@ -1,0 +1,23 @@
+[
+  {
+    "ip": "127.0.0.1",
+    "userAgent": "python-requests/2.31.0",
+    "reason": "Matched pattern: /python-requests/i",
+    "count": 1,
+    "lastAttempt": "2026-10-19T07:24:12.572Z"
+  },
+  {
+    "ip": "127.0.0.1",
+    "userAgent": "sqlmap/1.6.4",
+    "reason": "Matched pattern: /sqlmap/i",
+    "count": 1,
+    "lastAttempt": "2026-10-19T07:24:12.583Z"
+  },
+  {
+    "ip": "::1",
+    "userAgent": "curl/8.18.0",
+    "reason": "Matched pattern: /curl/",
+    "count": 1,
+    "lastAttempt": "2026-10-19T07:37:44.256Z"
+  }
+]

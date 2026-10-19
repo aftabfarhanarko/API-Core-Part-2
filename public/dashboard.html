@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Traffic & Security Analytics Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js for visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(23, 31, 51, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-title h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-top: 0.25rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.35rem;
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .kpi-card .kpi-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-card .kpi-val {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-top: 0.4rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .val-allowed { color: var(--success); }
+    .val-blocked { color: var(--danger); }
+    .val-neutral { color: #38bdf8; }
+    .val-warn { color: var(--warning); }
+
+    .kpi-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 640px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .chart-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .chart-card p {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 270px;
+      width: 100%;
+    }
+
+    /* Interactive DOM Bar Chart Section */
+    .dom-bars-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 0.8rem;
+    }
+
+    .dom-bar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding: 0.6rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background 0.2s ease;
+    }
+
+    .dom-bar-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .dom-bar-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .dom-bar-name {
+      font-weight: 600;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .dom-bar-stats {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .dom-bar-track {
+      background: rgba(255, 255, 255, 0.06);
+      height: 12px;
+      border-radius: 9999px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .dom-bar-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Search & Filter Controls */
+    .filter-bar {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      outline: none;
+      flex: 1;
+      min-width: 180px;
+      transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Tables Section */
+    .tables-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .tables-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .table-header h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .table-count-badge {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      max-height: 420px;
+      overflow-y: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #121827;
+      color: var(--text-muted);
+      padding: 0.75rem 0.8rem;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--card-border);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    thead th:hover {
+      color: var(--text);
+    }
+
+    tbody td {
+      padding: 0.75rem 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #cbd5e1;
+    }
+
+    tbody tr {
+      transition: background 0.15s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .pill-count {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .pill-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .ua-text {
+      max-width: 250px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: monospace;
+      font-size: 0.8rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: var(--text-muted);
+      font-size: 0.84rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-title">
+        <h1>📊 Traffic & Security Analytics</h1>
+        <p>Live DOM-driven dashboard rendering data from <code>userAgent.json</code> & <code>blocked.json</code></p>
+      </div>
+      <div class="header-actions">
+        <span class="badge-live">
+          <span class="pulse-dot"></span> Live Monitoring
+        </span>
+        <button class="btn btn-primary" id="btnRefresh">
+          🔄 Refresh Now
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Cards (DOM Updated) -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Allowed Hits</div>
+        <div class="kpi-val val-allowed" id="totalAllowedHits">0</div>
+        <div class="kpi-sub" id="allowedClientsCount">0 Unique Clients</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Blocked Attacks</div>
+        <div class="kpi-val val-blocked" id="totalBlockedHits">0</div>
+        <div class="kpi-sub" id="blockedBotsCount">0 Unique Bots / Scanners</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Block Rate</div>
+        <div class="kpi-val val-warn" id="blockPercentage">0%</div>
+        <div class="kpi-sub">Of total incoming requests</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Traffic</div>
+        <div class="kpi-val val-neutral" id="grandTotalHits">0</div>
+        <div class="kpi-sub">Recorded across all clients</div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+      <!-- Chart 1: Comparison Bar Chart (Chart.js) -->
+      <div class="chart-card">
+        <h3>Allowed vs Blocked Traffic (Chart.js)</h3>
+        <p>Comparison between legitimate client hits and blocked bot attempts</p>
+        <div class="chart-wrapper">
+          <canvas id="trafficBarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2: Client Breakdown (Chart.js) -->
+      <div class="chart-card">
+        <h3>Client Distribution (Doughnut)</h3>
+        <p>Proportion of Thunder Client, Postman, Browsers, and Scanners</p>
+        <div class="chart-wrapper">
+          <canvas id="clientDonutChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Pure DOM Bar Chart Section -->
+    <div class="chart-card" style="margin-bottom: 2rem;">
+      <h3>⚡ Client Breakdown (DOM-Generated Progress Bars)</h3>
+      <p>Direct DOM manipulation dynamically creating visual progress bars for each User-Agent</p>
+      
+      <!-- Container where DOM elements will be injected dynamically -->
+      <div class="dom-bars-container" id="domBarsList">
+        <div class="empty-state">Loading client breakdown...</div>
+      </div>
+    </div>
+
+    <!-- Tables Section -->
+    <div class="tables-section">
+      <!-- Allowed Requests Table (userAgent.json) -->
+      <div class="table-card">
+        <div class="table-header">
+          <h3>
+            <span style="color: var(--success);">●</span> Allowed Clients (<code>userAgent.json</code>)
+          </h3>
+          <span class="table-count-badge" id="allowedTableCount">0 items</span>
+        </div>
+
+        <!-- Filter Input with DOM Event Listener -->
+        <div class="filter-bar">
+          <input 
+            type="text" 
+            id="searchAllowedInput" 
+            class="search-input" 
+            placeholder="🔍 Filter allowed clients by IP or User-Agent..."
+          />
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortTable('allowed', 'ip')">IP Address ↕</th>
+                <th onclick="sortTable('allowed', 'userAgent')">Client User-Agent ↕</th>
+                <th onclick="sortTable('allowed', 'count')">Hits ↕</th>
+                <th onclick="sortTable('allowed', 'lastHit')">Last Seen ↕</th>
+              </tr>
+            </thead>
+            <tbody id="allowedTableBody">
+              <tr><td colspan="4" class="empty-state">Loading allowed clients...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Blocked Requests Table (blocked.json) -->
+      <div class="table-card">
+        <div class="table-header">
+          <h3>
+            <span style="color: var(--danger);">●</span> Blocked Bots (<code>blocked.json</code>)
+          </h3>
+          <span class="table-count-badge" id="blockedTableCount">0 items</span>
+        </div>
+
+        <!-- Filter Input with DOM Event Listener -->
+        <div class="filter-bar">
+          <input 
+            type="text" 
+            id="searchBlockedInput" 
+            class="search-input" 
+            placeholder="🔍 Filter blocked bots by IP, name or reason..."
+          />
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortTable('blocked', 'ip')">IP Address ↕</th>
+                <th onclick="sortTable('blocked', 'userAgent')">Blocked Bot ↕</th>
+                <th onclick="sortTable('blocked', 'count')">Attempts ↕</th>
+                <th onclick="sortTable('blocked', 'reason')">Reason / Pattern ↕</th>
+              </tr>
+            </thead>
+            <tbody id="blockedTableBody">
+              <tr><td colspan="4" class="empty-state">No blocked bots recorded yet 👍</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      User Management API • Live DOM Analytics from <code>userAgent.json</code> & <code>blocked.json</code>
+    </footer>
+  </div>
+
+  <!-- DOM MANIPULATION SCRIPT -->
+  <script>
+    // State Store
+    let rawAllowedData = [];
+    let rawBlockedData = [];
+    let barChartInstance = null;
+    let donutChartInstance = null;
+    let sortState = {
+      allowed: { col: 'count', asc: false },
+      blocked: { col: 'count', asc: false }
+    };
+
+    // DOM Elements
+    const btnRefresh = document.getElementById('btnRefresh');
+    const totalAllowedEl = document.getElementById('totalAllowedHits');
+    const totalBlockedEl = document.getElementById('totalBlockedHits');
+    const allowedClientsCountEl = document.getElementById('allowedClientsCount');
+    const blockedBotsCountEl = document.getElementById('blockedBotsCount');
+    const grandTotalEl = document.getElementById('grandTotalHits');
+    const blockPercentageEl = document.getElementById('blockPercentage');
+
+    const domBarsList = document.getElementById('domBarsList');
+    const allowedTableBody = document.getElementById('allowedTableBody');
+    const blockedTableBody = document.getElementById('blockedTableBody');
+    const allowedTableCount = document.getElementById('allowedTableCount');
+    const blockedTableCount = document.getElementById('blockedTableCount');
+
+    const searchAllowedInput = document.getElementById('searchAllowedInput');
+    const searchBlockedInput = document.getElementById('searchBlockedInput');
+
+    // Attach Event Listeners (DOM Event Manipulation)
+    btnRefresh.addEventListener('click', fetchAnalytics);
+    searchAllowedInput.addEventListener('input', () => renderAllowedTable(getFilteredAllowed()));
+    searchBlockedInput.addEventListener('input', () => renderBlockedTable(getFilteredBlocked()));
+
+    /**
+     * 1. Fetch JSON data from server (/api/analytics)
+     */
+    async function fetchAnalytics() {
+      btnRefresh.innerText = '⏳ Loading...';
+      btnRefresh.disabled = true;
+
+      try {
+        // Automatically connect to Express server on port 3000 if opened with VS Code Live Server
+        const API_BASE = (window.location.port !== '3000') ? 'http://localhost:3000' : '';
+        const response = await fetch(`${API_BASE}/api/analytics`);
+        const json = await response.json();
+
+        if (json.success && json.data) {
+          rawAllowedData = json.data.allowed || [];
+          rawBlockedData = json.data.blocked || [];
+
+          // Perform DOM Updates
+          updateKpis();
+          renderDomBars();
+          renderAllowedTable(getFilteredAllowed());
+          renderBlockedTable(getFilteredBlocked());
+          renderCharts();
+        }
+      } catch (err) {
+        console.error('DOM Analytics Fetch Error:', err);
+      } finally {
+        btnRefresh.innerText = '🔄 Refresh Now';
+        btnRefresh.disabled = false;
+      }
+    }
+
+    /**
+     * 2. DOM Manipulation: Update KPI Stats & Text
+     */
+    function updateKpis() {
+      const totalAllowed = rawAllowedData.reduce((sum, item) => sum + (item.count || 0), 0);
+      const totalBlocked = rawBlockedData.reduce((sum, item) => sum + (item.count || 0), 0);
+      const grandTotal = totalAllowed + totalBlocked;
+      const blockPct = grandTotal > 0 ? ((totalBlocked / grandTotal) * 100).toFixed(1) : 0;
+
+      // Updating DOM Node text
+      totalAllowedEl.textContent = totalAllowed.toLocaleString();
+      allowedClientsCountEl.textContent = `${rawAllowedData.length} Unique Clients`;
+
+      totalBlockedEl.textContent = totalBlocked.toLocaleString();
+      blockedBotsCountEl.textContent = `${rawBlockedData.length} Unique Bots/Scanners`;
+
+      grandTotalEl.textContent = grandTotal.toLocaleString();
+      blockPercentageEl.textContent = `${blockPct}%`;
+    }
+
+    /**
+     * 3. DOM Manipulation: Dynamic Client Breakdown Bars (pure JS DOM elements)
+     */
+    function renderDomBars() {
+      domBarsList.innerHTML = ''; // Clear previous elements
+
+      const totalAllowed = rawAllowedData.reduce((sum, item) => sum + (item.count || 0), 0);
+
+      if (rawAllowedData.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'empty-state';
+        emptyDiv.textContent = 'No client hits recorded in userAgent.json';
+        domBarsList.appendChild(emptyDiv);
+        return;
+      }
+
+      // Sort by count descending
+      const sorted = [...rawAllowedData].sort((a, b) => (b.count || 0) - (a.count || 0));
+
+      sorted.forEach(item => {
+        const pct = totalAllowed > 0 ? (((item.count || 0) / totalAllowed) * 100).toFixed(1) : 0;
+
+        // Dynamically creating DOM nodes using document.createElement
+        const barItem = document.createElement('div');
+        barItem.className = 'dom-bar-item';
+
+        const barInfo = document.createElement('div');
+        barInfo.className = 'dom-bar-info';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'dom-bar-name';
+        nameSpan.innerHTML = `<span>${getClientIcon(item.userAgent)}</span> <span>${escapeHtml(item.userAgent)}</span>`;
+
+        const statsSpan = document.createElement('span');
+        statsSpan.className = 'dom-bar-stats';
+        statsSpan.textContent = `${item.count || 1} hits (${pct}%) • IP: ${item.ip || '127.0.0.1'}`;
+
+        barInfo.appendChild(nameSpan);
+        barInfo.appendChild(statsSpan);
+
+        const trackDiv = document.createElement('div');
+        trackDiv.className = 'dom-bar-track';
+
+        const fillDiv = document.createElement('div');
+        fillDiv.className = 'dom-bar-fill';
+        fillDiv.style.width = `${pct}%`;
+        fillDiv.style.background = getClientColor(item.userAgent);
+
+        trackDiv.appendChild(fillDiv);
+        barItem.appendChild(barInfo);
+        barItem.appendChild(trackDiv);
+
+        // Append to DOM
+        domBarsList.appendChild(barItem);
+      });
+    }
+
+    /**
+     * 4. DOM Manipulation: Render Allowed Clients Table
+     */
+    function renderAllowedTable(list) {
+      allowedTableBody.innerHTML = '';
+      allowedTableCount.textContent = `${list.length} clients`;
+
+      if (list.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="4" class="empty-state">No matching clients found</td>`;
+        allowedTableBody.appendChild(tr);
+        return;
+      }
+
+      list.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span style="font-family: monospace; color: #93c5fd;">${escapeHtml(item.ip || '127.0.0.1')}</span></td>
+          <td><div class="ua-text" title="${escapeHtml(item.userAgent)}">${getClientIcon(item.userAgent)} ${escapeHtml(item.userAgent)}</div></td>
+          <td><span class="pill pill-count">${item.count || 1}</span></td>
+          <td style="font-size: 0.78rem; color: var(--text-muted);">${formatDate(item.lastHit)}</td>
+        `;
+        allowedTableBody.appendChild(tr);
+      });
+    }
+
+    /**
+     * 5. DOM Manipulation: Render Blocked Bots Table
+     */
+    function renderBlockedTable(list) {
+      blockedTableBody.innerHTML = '';
+      blockedTableCount.textContent = `${list.length} bots`;
+
+      if (list.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="4" class="empty-state">No blocked bots recorded yet 👍</td>`;
+        blockedTableBody.appendChild(tr);
+        return;
+      }
+
+      list.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span style="font-family: monospace; color: #fca5a5;">${escapeHtml(item.ip || '127.0.0.1')}</span></td>
+          <td><div class="ua-text" title="${escapeHtml(item.userAgent)}">🛑 ${escapeHtml(item.userAgent)}</div></td>
+          <td><span class="pill pill-danger">${item.count || 1}</span></td>
+          <td style="font-size: 0.75rem; color: #f87171;">${escapeHtml(item.reason || 'Blocked Pattern')}</td>
+        `;
+        blockedTableBody.appendChild(tr);
+      });
+    }
+
+    /**
+     * 6. DOM Filtering Functions
+     */
+    function getFilteredAllowed() {
+      const q = searchAllowedInput.value.toLowerCase().trim();
+      let list = rawAllowedData.filter(item => 
+        (item.userAgent && item.userAgent.toLowerCase().includes(q)) ||
+        (item.ip && item.ip.toLowerCase().includes(q))
+      );
+
+      // Sort
+      const { col, asc } = sortState.allowed;
+      return list.sort((a, b) => compareValues(a[col], b[col], asc));
+    }
+
+    function getFilteredBlocked() {
+      const q = searchBlockedInput.value.toLowerCase().trim();
+      let list = rawBlockedData.filter(item => 
+        (item.userAgent && item.userAgent.toLowerCase().includes(q)) ||
+        (item.ip && item.ip.toLowerCase().includes(q)) ||
+        (item.reason && item.reason.toLowerCase().includes(q))
+      );
+
+      // Sort
+      const { col, asc } = sortState.blocked;
+      return list.sort((a, b) => compareValues(a[col], b[col], asc));
+    }
+
+    /**
+     * 7. DOM Sorting Function
+     */
+    function sortTable(type, column) {
+      if (sortState[type].col === column) {
+        sortState[type].asc = !sortState[type].asc;
+      } else {
+        sortState[type].col = column;
+        sortState[type].asc = true;
+      }
+
+      if (type === 'allowed') {
+        renderAllowedTable(getFilteredAllowed());
+      } else {
+        renderBlockedTable(getFilteredBlocked());
+      }
+    }
+
+    function compareValues(a, b, asc) {
+      if (a === undefined || a === null) a = '';
+      if (b === undefined || b === null) b = '';
+      if (typeof a === 'number' && typeof b === 'number') {
+        return asc ? a - b : b - a;
+      }
+      return asc ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
+    }
+
+    /**
+     * 8. Render Charts (Chart.js Integration)
+     */
+    function renderCharts() {
+      const totalAllowed = rawAllowedData.reduce((sum, item) => sum + (item.count || 0), 0);
+      const totalBlocked = rawBlockedData.reduce((sum, item) => sum + (item.count || 0), 0);
+
+      // Bar Chart
+      const barCtx = document.getElementById('trafficBarChart').getContext('2d');
+      if (barChartInstance) barChartInstance.destroy();
+
+      barChartInstance = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Allowed Requests (userAgent.json)', 'Blocked Attacks (blocked.json)'],
+          datasets: [{
+            data: [totalAllowed, totalBlocked],
+            backgroundColor: ['rgba(16, 185, 129, 0.75)', 'rgba(239, 68, 68, 0.75)'],
+            borderColor: ['#10b981', '#ef4444'],
+            borderWidth: 1.5,
+            borderRadius: 8,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#cbd5e1', font: { weight: '600' } }
+            }
+          }
+        }
+      });
+
+      // Doughnut Chart
+      const donutCtx = document.getElementById('clientDonutChart').getContext('2d');
+      if (donutChartInstance) donutChartInstance.destroy();
+
+      const groups = {};
+      rawAllowedData.forEach(item => {
+        let name = 'Other';
+        const ua = (item.userAgent || '').toLowerCase();
+        if (ua.includes('thunder client')) name = 'Thunder Client';
+        else if (ua.includes('postman')) name = 'Postman';
+        else if (ua.includes('curl')) name = 'cURL';
+        else if (ua.includes('chrome')) name = 'Chrome';
+        else if (ua.includes('firefox')) name = 'Firefox';
+        groups[name] = (groups[name] || 0) + (item.count || 1);
+      });
+
+      donutChartInstance = new Chart(donutCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(groups),
+          datasets: [{
+            data: Object.values(groups),
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#64748b'],
+            borderColor: '#0b0f19',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: '#cbd5e1', font: { size: 12 } }
+            }
+          }
+        }
+      });
+    }
+
+    // Helper Functions
+    function getClientIcon(ua) {
+      if (!ua) return '🌐';
+      const low = ua.toLowerCase();
+      if (low.includes('thunder client')) return '⚡';
+      if (low.includes('postman')) return '🚀';
+      if (low.includes('curl')) return '💻';
+      if (low.includes('chrome')) return '🌐';
+      if (low.includes('firefox')) return '🦊';
+      return '📡';
+    }
+
+    function getClientColor(ua) {
+      if (!ua) return '#3b82f6';
+      const low = ua.toLowerCase();
+      if (low.includes('thunder client')) return 'linear-gradient(90deg, #3b82f6, #60a5fa)';
+      if (low.includes('postman')) return 'linear-gradient(90deg, #f97316, #fb923c)';
+      if (low.includes('curl')) return 'linear-gradient(90deg, #10b981, #34d399)';
+      if (low.includes('chrome')) return 'linear-gradient(90deg, #06b6d4, #22d3ee)';
+      if (low.includes('firefox')) return 'linear-gradient(90deg, #e11d48, #f43f5e)';
+      return 'linear-gradient(90deg, #6366f1, #818cf8)';
+    }
+
+    function formatDate(isoStr) {
+      if (!isoStr) return 'N/A';
+      try {
+        const d = new Date(isoStr);
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      } catch (e) {
+        return isoStr;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Initial Fetch & Auto polling every 5s
+    fetchAnalytics();
+    setInterval(fetchAnalytics, 5000);
+  </script>
+</body>
+</html>

@@ -114,6 +114,8 @@ The server will be available at: **`http://localhost:3000`**
 | Method | Endpoint | Description | Request Body | Auth Required |
 | :--- | :--- | :--- | :--- | :--- |
 | **GET** | `/` | Health check / Server status | None | No |
+| **GET** | `/dashboard` | Interactive Web Dashboard (Charts & Analytics) | None | No |
+| **GET** | `/api/analytics` | Analytics JSON API for Allowed vs Blocked data | None | No |
 | **GET** | `/api/users?token=123` | Retrieve all users | None | Yes |
 | **GET** | `/api/users/:id?token=123` | Retrieve user by ID | None | Yes |
 | **POST** | `/api/users?token=123` | Create a new user | JSON (`name`, `email`, `role`) | Yes |
