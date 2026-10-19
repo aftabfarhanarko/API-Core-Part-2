@@ -1,809 +1,2075 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Traffic & Security Analytics</title>
+  <title>ShieldAPI · Enterprise Traffic & Security Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
   <style>
     :root {
-      --bg: #f5f6f8;
-      --surface: #fff;
-      --line: #e4e7ec;
-      --line-soft: #eff1f4;
-      --ink: #0f1b2d;
-      --text: #1c2535;
-      --muted: #667085;
-      --primary: #2540c8;
-      --ok: #0b7a5a;
-      --bad: #b4332e;
-      --warn: #a15c07;
-      --ok-bg: #e6f4ef;
-      --bad-bg: #fbeceb;
-      --pri-bg: #eaeefc;
-      --shadow: 0 1px 2px rgba(15, 27, 45, .04), 0 12px 28px -16px rgba(15, 27, 45, .12);
-      --sans: 'Geist', system-ui, -apple-system, sans-serif;
-      --mono: 'Geist Mono', ui-monospace, Menlo, monospace;
-      --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+      --bg: #0b0f19;
+      --bg-alt: #111827;
+      --surface: rgba(17, 24, 39, 0.85);
+      --surface-card: #141e33;
+      --surface-hover: #1c2b48;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-bright: rgba(255, 255, 255, 0.16);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-sub: #6b7280;
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.2);
+      --warning: #f59e0b;
+      --warning-glow: rgba(245, 158, 11, 0.2);
+      --info: #06b6d4;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'Geist Mono', monospace;
+      --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --bg-alt: #ffffff;
+      --surface: rgba(255, 255, 255, 0.95);
+      --surface-card: #ffffff;
+      --surface-hover: #f1f5f9;
+      --border: #e2e8f0;
+      --border-bright: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-sub: #94a3b8;
+      --primary: #4f46e5;
+      --primary-light: #4338ca;
+      --primary-glow: rgba(79, 70, 229, 0.15);
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
-      padding: 0
+      padding: 0;
     }
 
     body {
       background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
+      color: var(--text-main);
+      font-family: var(--font-body);
       font-size: 14px;
-      line-height: 1.55;
-      padding: 2.5rem 2rem 3rem;
-      -webkit-font-smoothing: antialiased
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.25s, color 0.25s;
     }
 
     .container {
-      max-width: 1240px;
-      margin: 0 auto
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 4rem;
     }
 
-    code {
-      font-family: var(--mono);
-      font-size: .88em;
-      background: var(--line-soft);
-      padding: .08em .4em;
-      border-radius: 4px
-    }
-
-    :focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px
-    }
-
+    /* Top Navigation Bar */
     header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: center;
       gap: 1.5rem;
       flex-wrap: wrap;
-      margin-bottom: 2rem
+      padding: 1rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
     }
 
-    header h1 {
-      font-family: var(--serif);
-      font-weight: 400;
-      font-size: 2.4rem;
-      line-height: 1.1;
-      letter-spacing: -.015em;
-      color: var(--ink)
-    }
-
-    header p {
-      color: var(--muted);
-      margin-top: .4rem
-    }
-
-    .actions {
+    .brand {
       display: flex;
       align-items: center;
-      gap: .75rem
+      gap: 1rem;
     }
 
-    .status {
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: 700;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge-version {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      background: var(--primary-glow);
+      color: var(--primary-light);
+      border: 1px solid var(--primary);
+      padding: 0.1rem 0.45rem;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .brand-text p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .live-pill {
       display: inline-flex;
       align-items: center;
-      gap: .5rem;
-      background: var(--surface);
-      border: 1px solid var(--line);
+      gap: 0.5rem;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.85rem;
       border-radius: 999px;
-      padding: .3rem .8rem;
-      font-size: .82rem;
-      font-weight: 500;
-      box-shadow: var(--shadow)
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
     }
 
     .dot {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: var(--ok);
-      box-shadow: 0 0 0 3px var(--ok-bg);
-      animation: pulse 2.4s infinite
+      background: var(--success);
+      box-shadow: 0 0 0 3px var(--success-glow);
+      animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
-      50% {
-        opacity: .4
-      }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
     }
 
-    @media (prefers-reduced-motion:reduce) {
-      .dot {
-        animation: none
-      }
-
-      .bar-fill,
-      .split span {
-        transition: none !important
-      }
+    .select-sm {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      outline: none;
+      cursor: pointer;
     }
 
     .btn {
-      background: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--primary);
       color: #fff;
-      border: 1px solid var(--ink);
-      padding: .5rem 1.1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
       border-radius: 8px;
-      font: inherit;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
       font-weight: 500;
       cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 1px 2px rgba(15, 27, 45, .2);
-      transition: background .15s
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px var(--primary-glow);
     }
 
     .btn:hover {
-      background: #1d2c47
+      background: var(--primary-light);
+      transform: translateY(-1px);
     }
 
-    .btn:disabled {
-      opacity: .6;
-      cursor: wait
+    .btn-secondary {
+      background: var(--surface-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      box-shadow: none;
     }
 
-    .kpis {
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-bright);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      box-shadow: 0 2px 8px var(--danger-glow);
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-theme {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.45rem 0.65rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Tabs Bar */
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.75rem 1.2rem;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 10px 10px 0 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      color: var(--primary-light);
+      background: rgba(99, 102, 241, 0.08);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
       display: grid;
-      grid-template-columns: 1.6fr 1fr 1fr 1fr;
-      gap: 1px;
-      background: var(--line);
-      border: 1px solid var(--line);
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kpi-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
       border-radius: 14px;
-      overflow: hidden;
+      padding: 1.25rem 1.4rem;
       box-shadow: var(--shadow);
-      margin-bottom: 1.5rem
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
     }
 
-    @media(max-width:900px) {
-      .kpis {
-        grid-template-columns: 1fr 1fr
-      }
-
-      .kpi-hero {
-        grid-column: 1/-1
-      }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-bright);
     }
 
-    @media(max-width:520px) {
-      .kpis {
-        grid-template-columns: 1fr
-      }
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
     }
 
-    .kpi {
-      background: var(--surface);
-      padding: 1.4rem 1.5rem
+    .kpi-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
-    .kpi-label {
-      color: var(--muted);
-      font-weight: 500
+    .kpi-icon {
+      font-size: 1.1rem;
+      opacity: 0.7;
     }
 
     .kpi-val {
-      font-family: var(--serif);
-      font-size: 2.6rem;
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
       line-height: 1.1;
-      letter-spacing: -.02em;
-      margin-top: .35rem;
-      font-variant-numeric: tabular-nums
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
     }
 
-    .kpi-hero .kpi-val {
-      font-size: 3.6rem;
-      color: var(--ink)
-    }
+    .kpi-val.ok { color: var(--success); }
+    .kpi-val.bad { color: var(--danger); }
+    .kpi-val.warn { color: var(--warning); }
 
     .kpi-sub {
-      color: var(--muted);
-      font-size: .82rem;
-      margin-top: .2rem
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      margin-top: 0.35rem;
     }
 
-    .v-ok {
-      color: var(--ok)
-    }
-
-    .v-bad {
-      color: var(--bad)
-    }
-
-    .v-warn {
-      color: var(--warn)
-    }
-
-    .split {
-      display: flex;
-      gap: 2px;
-      height: 6px;
-      border-radius: 3px;
-      overflow: hidden;
-      background: var(--line-soft);
-      margin: 1.1rem 0 .7rem
-    }
-
-    .split span {
-      height: 100%;
-      transition: width .8s ease
-    }
-
-    .s-ok {
-      background: var(--ok)
-    }
-
-    .s-bad {
-      background: var(--bad)
-    }
-
+    /* Card standard */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
+      background: var(--surface-card);
+      border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 1.5rem;
-      box-shadow: var(--shadow)
+      padding: 1.4rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
     }
 
-    .card h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--ink);
-      letter-spacing: -.005em
-    }
-
-    .card .desc {
-      color: var(--muted);
-      font-size: .85rem;
-      margin: .15rem 0 1.25rem
-    }
-
-    .charts {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-      gap: 1.5rem;
-      margin-bottom: 1.5rem
-    }
-
-    .chart-wrap {
-      position: relative;
-      height: 260px
-    }
-
-    .bars {
-      display: flex;
-      flex-direction: column;
-      gap: 1.1rem
-    }
-
-    .bar-info {
+    .card-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 1rem;
+      margin-bottom: 1.2rem;
       flex-wrap: wrap;
-      margin-bottom: .4rem
     }
 
-    .bar-name {
-      font-weight: 500;
+    .card-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
       display: flex;
       align-items: center;
-      gap: .55rem;
-      min-width: 0;
-      word-break: break-all
+      gap: 0.5rem;
     }
 
-    .swatch {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      flex: none
+    .card-header p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
     }
 
-    .bar-stats {
-      color: var(--muted);
-      font-size: .82rem;
-      font-variant-numeric: tabular-nums
-    }
-
-    .bar-track {
-      background: var(--line-soft);
-      height: 6px;
-      border-radius: 3px;
-      overflow: hidden
-    }
-
-    .bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width .7s ease
-    }
-
-    .tables {
+    /* Charts Layout */
+    .charts-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
     }
 
-    @media(max-width:1024px) {
-      .tables {
-        grid-template-columns: 1fr
+    @media (max-width: 768px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
       }
     }
 
-    .t-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      gap: .5rem
+    .chart-box {
+      height: 270px;
+      position: relative;
     }
 
-    .t-head h3 {
-      display: flex;
-      align-items: center;
-      gap: .55rem
-    }
-
-    .count {
-      background: var(--line-soft);
-      color: var(--muted);
-      padding: .1rem .65rem;
-      border-radius: 999px;
-      font-size: .78rem;
-      font-weight: 500
-    }
-
-    .search {
-      width: 100%;
-      background: #fafbfc;
-      border: 1px solid var(--line);
-      color: var(--text);
-      padding: .55rem .85rem;
-      border-radius: 8px;
-      font: inherit;
-      margin-bottom: 1rem;
-      transition: border-color .15s, box-shadow .15s
-    }
-
-    .search::placeholder {
-      color: #98a2b3
-    }
-
-    .search:focus {
-      background: #fff;
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(37, 64, 200, .14)
-    }
-
+    /* Tables */
     .t-wrap {
-      overflow: auto;
-      max-height: 420px;
-      border: 1px solid var(--line);
-      border-radius: 10px
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      text-align: left
+      text-align: left;
     }
 
     thead th {
-      position: sticky;
-      top: 0;
-      background: #fafbfc;
-      color: var(--muted);
-      font-weight: 500;
-      font-size: .78rem;
-      padding: .7rem .9rem;
-      border-bottom: 1px solid var(--line);
-      cursor: pointer;
+      background: var(--bg);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
       user-select: none;
-      white-space: nowrap
-    }
-
-    thead th:hover {
-      color: var(--ink)
     }
 
     tbody td {
-      padding: .8rem .9rem;
-      border-bottom: 1px solid var(--line-soft)
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 0.85rem;
     }
 
     tbody tr:last-child td {
-      border-bottom: 0
+      border-bottom: none;
     }
 
     tbody tr:hover {
-      background: #fafbfc
+      background: var(--surface-hover);
     }
 
     .mono {
-      font-family: var(--mono);
-      font-size: .8rem
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
     }
 
-    .ua {
-      max-width: 240px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-family: var(--mono);
-      font-size: .78rem;
-      color: var(--muted)
-    }
-
+    /* Pills & Badges */
     .pill {
-      display: inline-block;
-      min-width: 2rem;
-      text-align: center;
-      padding: .12rem .55rem;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.55rem;
       border-radius: 6px;
-      font-size: .78rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      font-variant-numeric: tabular-nums
+      font-family: var(--font-mono);
     }
 
     .pill-ok {
-      background: var(--pri-bg);
-      color: var(--primary)
+      background: var(--success-glow);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
     }
 
     .pill-bad {
-      background: var(--bad-bg);
-      color: var(--bad)
+      background: var(--danger-glow);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
-    .muted {
-      color: var(--muted);
-      font-size: .8rem
+    .pill-warn {
+      background: var(--warning-glow);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.3);
     }
 
-    .empty {
+    .pill-method {
+      padding: 0.15rem 0.5rem;
+      font-weight: 700;
+      border-radius: 5px;
+    }
+
+    .method-get { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .method-post { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .method-put { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .method-delete { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .role-badge {
+      display: inline-flex;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .role-admin { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.4); }
+    .role-editor { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
+    .role-user { background: rgba(156, 163, 175, 0.2); color: #cbd5e1; border: 1px solid rgba(156, 163, 175, 0.4); }
+
+    .search-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.55rem 0.9rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      min-width: 260px;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    /* Client Progress Bars */
+    .bars-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .bar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+    }
+
+    .bar-track {
+      background: var(--bg);
+      height: 7px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s ease;
+    }
+
+    /* API Tester Studio */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 960px) {
+      .studio-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .select-method {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .input-url {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.6rem 0.9rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .input-url:focus, .select-method:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .textarea-json {
+      width: 100%;
+      height: 160px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    .textarea-json:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .response-pane {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 380px;
+    }
+
+    .response-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+
+    .response-body {
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      overflow: auto;
+      flex: 1;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #93c5fd;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border-bright);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      padding: 1.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .modal-header h4 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .btn-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 2000;
+    }
+
+    .toast {
+      background: var(--surface-card);
+      border: 1px solid var(--border-bright);
+      color: var(--text-main);
+      padding: 0.8rem 1.2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .empty-state {
+      padding: 2.5rem;
       text-align: center;
-      padding: 2.25rem 1rem;
-      color: var(--muted)
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 2.5rem;
-      color: var(--muted);
-      font-size: .82rem
+      color: var(--text-sub);
     }
   </style>
 </head>
 
 <body>
   <div class="container">
+    <!-- Top Bar -->
     <header>
-      <div>
-        <h1>Traffic &amp; security analytics</h1>
-        <p>Data from <code>userAgent.json</code> and <code>blocked.json</code>, refreshed every 5 seconds</p>
+      <div class="brand">
+        <div class="brand-icon">🛡️</div>
+        <div class="brand-text">
+          <h1>ShieldAPI Studio <span class="badge-version">v2.0 Pro</span></h1>
+          <p>Enterprise Traffic Analytics · Security Firewall · Live API Playground</p>
+        </div>
       </div>
-      <div class="actions">
-        <span class="status"><span class="dot"></span>Live</span>
-        <button class="btn" id="btnRefresh">Refresh now</button>
+
+      <div class="header-actions">
+        <div class="live-pill">
+          <span class="dot"></span>
+          <span>Live Monitor</span>
+        </div>
+
+        <select id="selectAutoRefresh" class="select-sm" title="Auto-refresh interval">
+          <option value="3000">Auto: 3s</option>
+          <option value="5000" selected>Auto: 5s</option>
+          <option value="10000">Auto: 10s</option>
+          <option value="0">Auto: Off</option>
+        </select>
+
+        <button class="btn btn-secondary" id="btnRefresh" title="Refresh data immediately">
+          <span>🔄</span> Refresh Now
+        </button>
+
+        <button class="btn-theme" id="btnToggleTheme" title="Toggle dark/light mode">
+          <span id="themeIcon">☀️</span>
+        </button>
       </div>
     </header>
 
-    <section class="kpis">
-      <div class="kpi kpi-hero">
-        <div class="kpi-label">Total requests</div>
-        <div class="kpi-val" id="grandTotalHits">0</div>
-        <div class="split" aria-hidden="true"><span class="s-ok" id="splitAllowed" style="width:0"></span><span
-            class="s-bad" id="splitBlocked" style="width:0"></span></div>
-        <div class="kpi-sub">Allowed and blocked, across all clients</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">Allowed</div>
-        <div class="kpi-val v-ok" id="totalAllowedHits">0</div>
-        <div class="kpi-sub" id="allowedClientsCount">0 unique clients</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">Blocked</div>
-        <div class="kpi-val v-bad" id="totalBlockedHits">0</div>
-        <div class="kpi-sub" id="blockedBotsCount">0 unique bots</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">Block rate</div>
-        <div class="kpi-val v-warn" id="blockPercentage">0%</div>
-        <div class="kpi-sub">Share of all requests</div>
-      </div>
-    </section>
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="tab-overview">📊 Traffic & Security</button>
+      <button class="tab-btn" data-tab="tab-audit">📋 Request Audit Stream</button>
+      <button class="tab-btn" data-tab="tab-studio">⚡ Interactive API Studio</button>
+      <button class="tab-btn" data-tab="tab-users">👥 User Management</button>
+      <button class="tab-btn" data-tab="tab-system">🩺 System Health & Specs</button>
+    </nav>
 
-    <section class="charts">
-      <div class="card">
-        <h3>Allowed vs blocked requests</h3>
-        <p class="desc">Legitimate client hits compared with blocked attempts</p>
-        <div class="chart-wrap"><canvas id="trafficBarChart"></canvas></div>
-      </div>
-      <div class="card">
-        <h3>Allowed requests by client</h3>
-        <p class="desc">Share of hits per client type</p>
-        <div class="chart-wrap"><canvas id="clientDonutChart"></canvas></div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-bottom:1.5rem">
-      <h3>Client breakdown</h3>
-      <p class="desc">Hits per user agent, as a share of allowed requests</p>
-      <div class="bars" id="domBarsList">
-        <div class="empty">Loading clients…</div>
-      </div>
-    </section>
-
-    <section class="tables">
-      <div class="card">
-        <div class="t-head">
-          <h3><span class="swatch" style="background:var(--ok)"></span>Allowed clients</h3>
-          <span class="count" id="allowedTableCount">0 clients</span>
+    <!-- TAB 1: TRAFFIC & SECURITY OVERVIEW -->
+    <div id="tab-overview" class="tab-content active">
+      <!-- KPI Grid -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">Total Requests</span>
+            <span class="kpi-icon">🌐</span>
+          </div>
+          <div class="kpi-val" id="kpiTotalRequests">0</div>
+          <div class="kpi-sub">Total incoming traffic logged</div>
         </div>
-        <input type="text" id="searchAllowedInput" class="search" placeholder="Filter by IP or user agent"
-          aria-label="Filter allowed clients">
-        <div class="t-wrap">
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">Allowed Hits</span>
+            <span class="kpi-icon">✅</span>
+          </div>
+          <div class="kpi-val ok" id="kpiAllowedHits">0</div>
+          <div class="kpi-sub" id="kpiUniqueClients">0 unique clients</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">Blocked Threats</span>
+            <span class="kpi-icon">🛑</span>
+          </div>
+          <div class="kpi-val bad" id="kpiBlockedHits">0</div>
+          <div class="kpi-sub" id="kpiUniqueBots">0 malicious bots intercepted</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">Block Ratio</span>
+            <span class="kpi-icon">🛡️</span>
+          </div>
+          <div class="kpi-val warn" id="kpiBlockRate">0%</div>
+          <div class="kpi-sub">Threat mitigation percentage</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">Avg Latency</span>
+            <span class="kpi-icon">⚡</span>
+          </div>
+          <div class="kpi-val" id="kpiAvgLatency">0 ms</div>
+          <div class="kpi-sub">Server response duration</div>
+        </div>
+      </section>
+
+      <!-- Charts Grid -->
+      <section class="charts-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Traffic Distribution</h3>
+              <p>Legitimate incoming hits vs intercepted malicious bots</p>
+            </div>
+          </div>
+          <div class="chart-box">
+            <canvas id="trafficBarChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Client Ecosystem</h3>
+              <p>Share of requests by client identity (Postman, Thunder Client, Chrome)</p>
+            </div>
+          </div>
+          <div class="chart-box">
+            <canvas id="clientDonutChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>HTTP Status Breakdown</h3>
+              <p>Success (2xx), Auth (401/403), Limits (429), and Errors</p>
+            </div>
+          </div>
+          <div class="chart-box">
+            <canvas id="statusPieChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Response Latency Histogram</h3>
+              <p>Execution duration grouping from audit records</p>
+            </div>
+          </div>
+          <div class="chart-box">
+            <canvas id="latencyBarChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Client Breakdown Bars -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <h3>User-Agent Volume & Share</h3>
+            <p>Breakdown of legitimate client traffic recorded in <code>userAgent.json</code></p>
+          </div>
+        </div>
+        <div class="bars-list" id="clientBarsList">
+          <div class="empty-state">Loading client breakdown…</div>
+        </div>
+      </section>
+
+      <!-- Tables: Allowed vs Blocked -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Allowed Clients</h3>
+              <p id="allowedCountLabel">0 clients tracked</p>
+            </div>
+            <input type="text" id="searchAllowed" class="search-input" placeholder="Search by IP or client…">
+          </div>
+          <div class="t-wrap" style="max-height: 380px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Client IP</th>
+                  <th>User-Agent</th>
+                  <th>Hits</th>
+                  <th>Last Hit</th>
+                </tr>
+              </thead>
+              <tbody id="allowedTableBody">
+                <tr><td colspan="4" class="empty-state">Loading allowed clients…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Blocked Threats & Bots</h3>
+              <p id="blockedCountLabel">0 threats blocked</p>
+            </div>
+            <input type="text" id="searchBlocked" class="search-input" placeholder="Search bot or IP…">
+          </div>
+          <div class="t-wrap" style="max-height: 380px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>IP Address</th>
+                  <th>Bot Signature</th>
+                  <th>Attempts</th>
+                  <th>Block Reason</th>
+                </tr>
+              </thead>
+              <tbody id="blockedTableBody">
+                <tr><td colspan="4" class="empty-state">No blocked bots recorded yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: REQUEST AUDIT STREAM -->
+    <div id="tab-audit" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Audit Log Stream</h3>
+            <p>Granular request audit logs from <code>loges/request.json</code> with safe rolling buffer</p>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+            <input type="text" id="searchAudit" class="search-input" placeholder="Search URL, IP, agent…">
+            <button class="btn btn-secondary" id="btnExportJson">📥 JSON</button>
+            <button class="btn btn-secondary" id="btnExportCsv">📥 CSV</button>
+            <button class="btn btn-danger" id="btnClearLogs">🗑️ Clear Logs</button>
+          </div>
+        </div>
+
+        <!-- Filter pills -->
+        <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
+          <span style="font-size:0.8rem; color:var(--text-muted); align-self:center; font-weight:600;">Method:</span>
+          <button class="btn btn-secondary btn-sm filter-method active" data-method="ALL">ALL</button>
+          <button class="btn btn-secondary btn-sm filter-method" data-method="GET">GET</button>
+          <button class="btn btn-secondary btn-sm filter-method" data-method="POST">POST</button>
+          <button class="btn btn-secondary btn-sm filter-method" data-method="PUT">PUT</button>
+          <button class="btn btn-secondary btn-sm filter-method" data-method="DELETE">DELETE</button>
+        </div>
+
+        <div class="t-wrap" style="max-height: 600px;">
           <table>
             <thead>
               <tr>
-                <th onclick="sortTable('allowed','ip')">IP address ↕</th>
-                <th onclick="sortTable('allowed','userAgent')">User agent ↕</th>
-                <th onclick="sortTable('allowed','count')">Hits ↕</th>
-                <th onclick="sortTable('allowed','lastHit')">Last seen ↕</th>
+                <th>Timestamp</th>
+                <th>Method</th>
+                <th>URL Path</th>
+                <th>Client IP</th>
+                <th>Status</th>
+                <th>Latency</th>
+                <th>User-Agent</th>
               </tr>
             </thead>
-            <tbody id="allowedTableBody">
-              <tr>
-                <td colspan="4" class="empty">Loading clients…</td>
-              </tr>
+            <tbody id="auditTableBody">
+              <tr><td colspan="7" class="empty-state">Loading audit stream…</td></tr>
             </tbody>
           </table>
         </div>
       </div>
+    </div>
 
+    <!-- TAB 3: INTERACTIVE API STUDIO -->
+    <div id="tab-studio" class="tab-content">
       <div class="card">
-        <div class="t-head">
-          <h3><span class="swatch" style="background:var(--bad)"></span>Blocked bots</h3>
-          <span class="count" id="blockedTableCount">0 bots</span>
+        <div class="card-header">
+          <div>
+            <h3>Interactive API Test Studio</h3>
+            <p>Execute live requests directly against the REST endpoints with full payload and header control</p>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <label class="form-label" style="margin:0;">Quick Presets:</label>
+            <select id="studioPresets" class="select-sm">
+              <option value="getUsers">GET /api/users (List all)</option>
+              <option value="getUsersFiltered">GET /api/users?role=admin</option>
+              <option value="getUserStats">GET /api/users/stats</option>
+              <option value="getUserById">GET /api/users/1</option>
+              <option value="postUser">POST /api/users (Create user)</option>
+              <option value="putUser">PUT /api/users/1 (Update user)</option>
+              <option value="deleteUser">DELETE /api/users/4</option>
+              <option value="getHealth">GET /api/health</option>
+              <option value="getAnalytics">GET /api/analytics</option>
+              <option value="unauthorized">GET /api/users (Invalid token test)</option>
+            </select>
+          </div>
         </div>
-        <input type="text" id="searchBlockedInput" class="search" placeholder="Filter by IP, bot or reason"
-          aria-label="Filter blocked bots">
+
+        <div class="studio-grid">
+          <!-- Request Builder Panel -->
+          <div>
+            <div class="form-group">
+              <label class="form-label">HTTP Method &amp; Endpoint</label>
+              <div class="input-row">
+                <select id="studioMethod" class="select-method">
+                  <option value="GET">GET</option>
+                  <option value="POST">POST</option>
+                  <option value="PUT">PUT</option>
+                  <option value="DELETE">DELETE</option>
+                </select>
+                <input type="text" id="studioUrl" class="input-url" value="/api/users">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Authentication Token (Bearer / Key / Query)</label>
+              <input type="text" id="studioToken" class="search-input" style="width:100%; font-family:var(--font-mono);" value="123" placeholder="Enter API token (default: 123)">
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <label class="form-label" style="margin:0;">JSON Request Body (POST / PUT)</label>
+                <button class="btn btn-secondary" style="padding:0.2rem 0.6rem; font-size:0.75rem;" id="btnFormatJson">Prettify JSON</button>
+              </div>
+              <textarea id="studioBody" class="textarea-json" placeholder='{\n  "name": "Mahmud Hasan",\n  "email": "mahmud@example.com",\n  "role": "editor"\n}'></textarea>
+            </div>
+
+            <button class="btn" id="btnSendRequest" style="width:100%; justify-content:center; padding:0.75rem;">
+              <span>🚀</span> Execute Request
+            </button>
+          </div>
+
+          <!-- Response Inspector Panel -->
+          <div>
+            <div class="response-pane">
+              <div class="response-header">
+                <div>
+                  <strong>Response: </strong>
+                  <span id="respStatusPill" class="pill pill-ok">Ready</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span id="respDuration" style="color:var(--text-sub); font-family:var(--font-mono);">0 ms</span>
+                  <button class="btn btn-secondary" id="btnCopyResponse" style="padding:0.25rem 0.5rem; font-size:0.75rem;">Copy</button>
+                </div>
+              </div>
+              <pre class="response-body" id="respJson">// Response will appear here after execution</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: USER MANAGEMENT STUDIO -->
+    <div id="tab-users" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Live User Directory</h3>
+            <p>Manage application users directly via backend REST endpoints</p>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            <input type="text" id="searchUsersInput" class="search-input" placeholder="Search name or email…">
+            <select id="filterUserRole" class="select-sm">
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="editor">Editor</option>
+              <option value="user">User</option>
+            </select>
+            <button class="btn" id="btnOpenAddUserModal">
+              <span>➕</span> Add New User
+            </button>
+          </div>
+        </div>
+
         <div class="t-wrap">
           <table>
             <thead>
               <tr>
-                <th onclick="sortTable('blocked','ip')">IP address ↕</th>
-                <th onclick="sortTable('blocked','userAgent')">Bot ↕</th>
-                <th onclick="sortTable('blocked','count')">Attempts ↕</th>
-                <th onclick="sortTable('blocked','reason')">Reason ↕</th>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="blockedTableBody">
-              <tr>
-                <td colspan="4" class="empty">No blocked bots recorded yet.</td>
-              </tr>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" class="empty-state">Loading users…</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-    </section>
+    </div>
 
-    <footer>User Management API · Analytics from <code>userAgent.json</code> and <code>blocked.json</code></footer>
+    <!-- TAB 5: SYSTEM HEALTH & SPECS -->
+    <div id="tab-system" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Runtime Environment &amp; Server Specs</h3>
+            <p>Live health metrics retrieved from <code>/api/health</code></p>
+          </div>
+          <button class="btn btn-secondary" id="btnRefreshHealth">Refresh Health</button>
+        </div>
+
+        <div class="kpi-grid" style="margin-bottom:1.5rem;">
+          <div class="kpi-card">
+            <div class="kpi-title">Process Status</div>
+            <div class="kpi-val ok" id="healthStatus">UP</div>
+            <div class="kpi-sub">HTTP 200 operational</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-title">Uptime</div>
+            <div class="kpi-val" id="healthUptime">0s</div>
+            <div class="kpi-sub">Continuous operation</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-title">Memory Heap Used</div>
+            <div class="kpi-val" id="healthHeapUsed">0 MB</div>
+            <div class="kpi-sub" id="healthHeapTotal">Total: 0 MB</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-title">Memory RSS</div>
+            <div class="kpi-val" id="healthRss">0 MB</div>
+            <div class="kpi-sub">Resident memory size</div>
+          </div>
+        </div>
+
+        <div class="card" style="background:var(--bg);">
+          <div class="card-header">
+            <h3>Registered API Routes Catalog</h3>
+          </div>
+          <div class="t-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>Route Endpoint</th>
+                  <th>Protection</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="pill pill-method method-get">GET</span></td>
+                  <td class="mono">/dashboard</td>
+                  <td><span class="pill pill-ok">Public</span></td>
+                  <td>Interactive Real-Time Monitoring &amp; Security Studio</td>
+                </tr>
+                <tr>
+                  <td><span class="pill pill-method method-get">GET</span></td>
+                  <td class="mono">/api/health</td>
+                  <td><span class="pill pill-ok">Public</span></td>
+                  <td>Node.js process status, memory, CPU &amp; uptime</td>
+                </tr>
+                <tr>
+                  <td><span class="pill pill-method method-get">GET</span></td>
+                  <td class="mono">/api/analytics</td>
+                  <td><span class="pill pill-warn">Firewall</span></td>
+                  <td>Aggregated statistics, bot alerts &amp; audit metrics</td>
+                </tr>
+                <tr>
+                  <td><span class="pill pill-method method-get">GET</span></td>
+                  <td class="mono">/api/users</td>
+                  <td><span class="pill pill-bad">Token Required</span></td>
+                  <td>List users with search, role filtering &amp; pagination</td>
+                </tr>
+                <tr>
+                  <td><span class="pill pill-method method-get">GET</span></td>
+                  <td class="mono">/api/users/stats</td>
+                  <td><span class="pill pill-bad">Token Required</span></td>
+                  <td>Aggregated user counts, roles breakdown and activity</td>
+                </tr>
+                <tr>
+                  <td><span class="pill pill-method method-get">GET</span></td>
+                  <td class="mono">/api/users/:id</td>
+                  <td><span class="pill pill-bad">Token Required</span></td>
+                  <td>Retrieve individual user record by numeric ID</td>
+                </tr>
+                <tr>
+                  <td><span class="pill pill-method method-post">POST</span></td>
+                  <td class="mono">/api/users</td>
+                  <td><span class="pill pill-bad">Token Required</span></td>
+                  <td>Create user with validation and duplicate prevention</td>
+                </tr>
+                <tr>
+                  <td><span class="pill pill-method method-put">PUT</span></td>
+                  <td class="mono">/api/users/:id</td>
+                  <td><span class="pill pill-bad">Token Required</span></td>
+                  <td>Update user credentials, role or active status</td>
+                </tr>
+                <tr>
+                  <td><span class="pill pill-method method-delete">DELETE</span></td>
+                  <td class="mono">/api/users/:id</td>
+                  <td><span class="pill pill-bad">Token Required</span></td>
+                  <td>Remove user record with verification</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    let rawAllowedData = [], rawBlockedData = [], barChartInstance = null, donutChartInstance = null;
-    const sortState = { allowed: { col: 'count', asc: false }, blocked: { col: 'count', asc: false } };
-    const $ = id => document.getElementById(id);
-    const btnRefresh = $('btnRefresh'), domBarsList = $('domBarsList'),
-      allowedTableBody = $('allowedTableBody'), blockedTableBody = $('blockedTableBody'),
-      searchAllowedInput = $('searchAllowedInput'), searchBlockedInput = $('searchBlockedInput');
-
-    btnRefresh.addEventListener('click', fetchAnalytics);
-    searchAllowedInput.addEventListener('input', () => renderAllowedTable(getFilteredAllowed()));
-    searchBlockedInput.addEventListener('input', () => renderBlockedTable(getFilteredBlocked()));
-
-    const sum = list => list.reduce((s, i) => s + (i.count || 0), 0);
-
-    async function fetchAnalytics() {
-      btnRefresh.textContent = 'Loading…';
-      btnRefresh.disabled = true;
-      try {
-        const API_BASE = window.location.port !== '3000' ? 'http://localhost:3000' : '';
-        const json = await (await fetch(`${API_BASE}/api/analytics`)).json();
-        if (json.success && json.data) {
-          rawAllowedData = json.data.allowed || [];
-          rawBlockedData = json.data.blocked || [];
-          updateKpis();
-          renderDomBars();
-          renderAllowedTable(getFilteredAllowed());
-          renderBlockedTable(getFilteredBlocked());
-          renderCharts();
-        }
-      } catch (err) {
-        console.error('Analytics fetch error:', err);
-      } finally {
-        btnRefresh.textContent = 'Refresh now';
-        btnRefresh.disabled = false;
-      }
-    }
-
-    function updateKpis() {
-      const a = sum(rawAllowedData), b = sum(rawBlockedData), total = a + b;
-      $('totalAllowedHits').textContent = a.toLocaleString();
-      $('allowedClientsCount').textContent = `${rawAllowedData.length} unique clients`;
-      $('totalBlockedHits').textContent = b.toLocaleString();
-      $('blockedBotsCount').textContent = `${rawBlockedData.length} unique bots`;
-      $('grandTotalHits').textContent = total.toLocaleString();
-      const ap = total > 0 ? (a / total) * 100 : 0;
-      $('splitAllowed').style.width = `${ap}%`;
-      $('splitBlocked').style.width = `${total > 0 ? 100 - ap : 0}%`;
-      $('blockPercentage').textContent = `${total > 0 ? ((b / total) * 100).toFixed(1) : 0}%`;
-    }
-
-    function renderDomBars() {
-      domBarsList.innerHTML = '';
-      const total = sum(rawAllowedData);
-      if (!rawAllowedData.length) {
-        domBarsList.innerHTML = '<div class="empty">No client hits recorded in userAgent.json.</div>';
-        return;
-      }
-      [...rawAllowedData].sort((a, b) => (b.count || 0) - (a.count || 0)).forEach(item => {
-        const pct = total > 0 ? (((item.count || 0) / total) * 100).toFixed(1) : 0;
-        const color = getClientColor(item.userAgent);
-        const row = document.createElement('div');
-        row.innerHTML = `
-      <div class="bar-info">
-        <span class="bar-name"><span class="swatch" style="background:${color}"></span>${escapeHtml(item.userAgent)}</span>
-        <span class="bar-stats">${item.count || 1} hits (${pct}%) · IP ${escapeHtml(item.ip || '127.0.0.1')}</span>
+  <!-- User Modal (Add / Edit) -->
+  <div class="modal-backdrop" id="userModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 id="userModalTitle">Add New User</h4>
+        <button class="btn-close" id="btnCloseUserModal">&times;</button>
       </div>
-      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
-        domBarsList.appendChild(row);
-      });
+
+      <form id="userForm">
+        <input type="hidden" id="formUserId">
+
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="formUserName" class="search-input" style="width:100%;" required placeholder="e.g. Shakib Al Hasan">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" id="formUserEmail" class="search-input" style="width:100%;" required placeholder="name@example.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select id="formUserRole" class="select-sm" style="width:100%;">
+            <option value="user">User</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="formUserStatus" class="select-sm" style="width:100%;">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelUserModal">Cancel</button>
+          <button type="submit" class="btn" id="btnSaveUser">Save User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // State Store
+    let rawAllowed = [];
+    let rawBlocked = [];
+    let rawRequests = [];
+    let rawUsers = [];
+    let activeMethodFilter = 'ALL';
+    let autoRefreshTimer = null;
+
+    // Chart instances
+    let barChart = null, donutChart = null, statusChart = null, latencyChart = null;
+
+    const $ = id => document.getElementById(id);
+
+    // Helpers
+    const escapeHtml = str => str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '';
+
+    function showToast(msg, type = 'info') {
+      const container = $('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      toast.innerHTML = `<span>${icon}</span> <span>${escapeHtml(msg)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 250);
+      }, 3500);
     }
 
-    function renderAllowedTable(list) {
-      allowedTableBody.innerHTML = '';
-      $('allowedTableCount').textContent = `${list.length} clients`;
-      if (!list.length) {
-        allowedTableBody.innerHTML = '<tr><td colspan="4" class="empty">No matching clients.</td></tr>';
-        return;
+    // Theme Switcher
+    const htmlEl = document.documentElement;
+    const btnToggleTheme = $('btnToggleTheme');
+    const themeIcon = $('themeIcon');
+
+    const savedTheme = localStorage.getItem('shield_theme') || 'dark';
+    setTheme(savedTheme);
+
+    btnToggleTheme.addEventListener('click', () => {
+      const nextTheme = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      setTheme(nextTheme);
+    });
+
+    function setTheme(theme) {
+      htmlEl.setAttribute('data-theme', theme);
+      localStorage.setItem('shield_theme', theme);
+      themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+      if (barChart) renderCharts();
+    }
+
+    // Tabs Switcher
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        btn.classList.add('active');
+        const tabId = btn.getAttribute('data-tab');
+        const tabEl = $(tabId);
+        if (tabEl) tabEl.classList.add('active');
+
+        if (tabId === 'tab-users') loadUsers();
+        if (tabId === 'tab-system') loadSystemHealth();
+      });
+    });
+
+    // Auto-refresh Interval
+    const selectAutoRefresh = $('selectAutoRefresh');
+    selectAutoRefresh.addEventListener('change', () => {
+      resetAutoRefresh();
+    });
+
+    function resetAutoRefresh() {
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      const ms = parseInt(selectAutoRefresh.value, 10);
+      if (ms > 0) {
+        autoRefreshTimer = setInterval(() => {
+          fetchAnalytics();
+        }, ms);
       }
-      list.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-      <td class="mono">${escapeHtml(item.ip || '127.0.0.1')}</td>
-      <td><div class="ua" title="${escapeHtml(item.userAgent)}">${escapeHtml(item.userAgent)}</div></td>
-      <td><span class="pill pill-ok">${item.count || 1}</span></td>
-      <td class="muted">${formatDate(item.lastHit)}</td>`;
-        allowedTableBody.appendChild(tr);
-      });
     }
 
-    function renderBlockedTable(list) {
-      blockedTableBody.innerHTML = '';
-      $('blockedTableCount').textContent = `${list.length} bots`;
-      if (!list.length) {
-        blockedTableBody.innerHTML = '<tr><td colspan="4" class="empty">No blocked bots recorded yet.</td></tr>';
-        return;
+    $('btnRefresh').addEventListener('click', () => {
+      fetchAnalytics();
+      showToast('Data refreshed successfully', 'success');
+    });
+
+    // Fetch Analytics Data
+    async function fetchAnalytics() {
+      try {
+        const res = await fetch('/api/analytics');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        const data = json.data || {};
+
+        rawAllowed = data.allowed || [];
+        rawBlocked = data.blocked || [];
+        rawRequests = data.requests || [];
+
+        renderKPIs(data);
+        renderCharts(data.stats);
+        renderBarsList();
+        renderAllowedTable();
+        renderBlockedTable();
+        renderAuditTable();
+      } catch (err) {
+        console.error('Failed to fetch analytics:', err);
       }
-      list.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-      <td class="mono">${escapeHtml(item.ip || '127.0.0.1')}</td>
-      <td><div class="ua" title="${escapeHtml(item.userAgent)}">${escapeHtml(item.userAgent)}</div></td>
-      <td><span class="pill pill-bad">${item.count || 1}</span></td>
-      <td class="muted">${escapeHtml(item.reason || 'Blocked pattern')}</td>`;
-        blockedTableBody.appendChild(tr);
-      });
     }
 
-    function getFilteredAllowed() {
-      const q = searchAllowedInput.value.toLowerCase().trim();
-      const list = rawAllowedData.filter(i =>
-        (i.userAgent && i.userAgent.toLowerCase().includes(q)) || (i.ip && i.ip.toLowerCase().includes(q)));
-      const { col, asc } = sortState.allowed;
-      return list.sort((a, b) => compareValues(a[col], b[col], asc));
+    function renderKPIs(data) {
+      const allowedHits = data.totalAllowedCount || 0;
+      const blockedHits = data.totalBlockedCount || 0;
+      const total = allowedHits + blockedHits;
+      const rate = total > 0 ? ((blockedHits / total) * 100).toFixed(1) : '0.0';
+
+      $('kpiTotalRequests').textContent = total.toLocaleString();
+      $('kpiAllowedHits').textContent = allowedHits.toLocaleString();
+      $('kpiUniqueClients').textContent = `${rawAllowed.length} unique clients`;
+
+      $('kpiBlockedHits').textContent = blockedHits.toLocaleString();
+      $('kpiUniqueBots').textContent = `${rawBlocked.length} unique threat signatures`;
+
+      $('kpiBlockRate').textContent = `${rate}%`;
+
+      const avgMs = data.stats?.avgResponseTimeMs || 0;
+      $('kpiAvgLatency').textContent = `${avgMs} ms`;
     }
 
-    function getFilteredBlocked() {
-      const q = searchBlockedInput.value.toLowerCase().trim();
-      const list = rawBlockedData.filter(i =>
-        (i.userAgent && i.userAgent.toLowerCase().includes(q)) ||
-        (i.ip && i.ip.toLowerCase().includes(q)) ||
-        (i.reason && i.reason.toLowerCase().includes(q)));
-      const { col, asc } = sortState.blocked;
-      return list.sort((a, b) => compareValues(a[col], b[col], asc));
-    }
-
-    function sortTable(type, column) {
-      const s = sortState[type];
-      if (s.col === column) s.asc = !s.asc; else { s.col = column; s.asc = true; }
-      type === 'allowed' ? renderAllowedTable(getFilteredAllowed()) : renderBlockedTable(getFilteredBlocked());
-    }
-
-    function compareValues(a, b, asc) {
-      a = a ?? ''; b = b ?? '';
-      if (typeof a === 'number' && typeof b === 'number') return asc ? a - b : b - a;
-      return asc ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
-    }
-
-    const TICK = '#667085', GRID = '#edf0f3';
-    const CLIENT_COLORS = { 'Thunder Client': '#2540c8', 'Postman': '#d9731f', 'cURL': '#0b7a5a', 'Chrome': '#0e7490', 'Firefox': '#b4325a', 'Other': '#8591a3' };
-
-    function clientName(ua) {
+    // Client Classifier
+    function getClientName(ua) {
       const low = (ua || '').toLowerCase();
       if (low.includes('thunder client')) return 'Thunder Client';
       if (low.includes('postman')) return 'Postman';
       if (low.includes('curl')) return 'cURL';
       if (low.includes('chrome')) return 'Chrome';
       if (low.includes('firefox')) return 'Firefox';
+      if (low.includes('safari') && !low.includes('chrome')) return 'Safari';
       return 'Other';
     }
-    const getClientColor = ua => CLIENT_COLORS[clientName(ua)];
 
-    function renderCharts() {
-      Chart.defaults.font.family = "'Geist', system-ui, sans-serif";
-      if (barChartInstance) barChartInstance.destroy();
-      barChartInstance = new Chart($('trafficBarChart').getContext('2d'), {
+    const CLIENT_COLORS = {
+      'Thunder Client': '#4f46e5',
+      'Postman': '#f97316',
+      'Chrome': '#06b6d4',
+      'Firefox': '#ec4899',
+      'cURL': '#10b981',
+      'Safari': '#3b82f6',
+      'Other': '#6b7280'
+    };
+
+    function renderCharts(stats = {}) {
+      const isDark = htmlEl.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#9ca3af' : '#475569';
+      const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+
+      Chart.defaults.font.family = "'Inter', sans-serif";
+      Chart.defaults.color = textColor;
+
+      // 1. Bar Chart: Traffic
+      if (barChart) barChart.destroy();
+      const ctxBar = $('trafficBarChart').getContext('2d');
+      const totalAllowed = rawAllowed.reduce((acc, c) => acc + (c.count || 0), 0);
+      const totalBlocked = rawBlocked.reduce((acc, c) => acc + (c.count || 0), 0);
+
+      barChart = new Chart(ctxBar, {
         type: 'bar',
         data: {
-          labels: ['Allowed', 'Blocked'],
-          datasets: [{ data: [sum(rawAllowedData), sum(rawBlockedData)], backgroundColor: ['#0b7a5a', '#b4332e'], borderRadius: 6, maxBarThickness: 72 }]
+          labels: ['Allowed Hits', 'Blocked Threats'],
+          datasets: [{
+            data: [totalAllowed, totalBlocked],
+            backgroundColor: ['#10b981', '#ef4444'],
+            borderRadius: 8,
+            maxBarThickness: 64,
+          }]
         },
         options: {
-          responsive: true, maintainAspectRatio: false,
+          responsive: true,
+          maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { beginAtZero: true, grid: { color: GRID }, ticks: { color: TICK } },
-            x: { grid: { display: false }, ticks: { color: '#1c2535', font: { weight: '500' } } }
+            y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+            x: { grid: { display: false }, ticks: { color: textColor, font: { weight: '600' } } }
           }
         }
       });
 
-      if (donutChartInstance) donutChartInstance.destroy();
-      const groups = {};
-      rawAllowedData.forEach(i => { const n = clientName(i.userAgent); groups[n] = (groups[n] || 0) + (i.count || 1); });
-      donutChartInstance = new Chart($('clientDonutChart').getContext('2d'), {
+      // 2. Donut Chart: Clients
+      if (donutChart) donutChart.destroy();
+      const clientGroups = {};
+      rawAllowed.forEach(item => {
+        const name = getClientName(item.userAgent);
+        clientGroups[name] = (clientGroups[name] || 0) + (item.count || 1);
+      });
+
+      const donutLabels = Object.keys(clientGroups);
+      const donutData = Object.values(clientGroups);
+      const donutColors = donutLabels.map(l => CLIENT_COLORS[l] || '#6b7280');
+
+      const ctxDonut = $('clientDonutChart').getContext('2d');
+      donutChart = new Chart(ctxDonut, {
         type: 'doughnut',
         data: {
-          labels: Object.keys(groups),
-          datasets: [{ data: Object.values(groups), backgroundColor: Object.keys(groups).map(n => CLIENT_COLORS[n]), borderColor: '#fff', borderWidth: 2 }]
+          labels: donutLabels,
+          datasets: [{
+            data: donutData,
+            backgroundColor: donutColors,
+            borderColor: isDark ? '#141e33' : '#ffffff',
+            borderWidth: 2,
+          }]
         },
         options: {
-          responsive: true, maintainAspectRatio: false, cutout: '62%',
-          plugins: { legend: { position: 'right', labels: { color: '#1c2535', boxWidth: 12, boxHeight: 12 } } }
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }
+          }
+        }
+      });
+
+      // 3. Status Code Breakdown
+      if (statusChart) statusChart.destroy();
+      const statusCounts = stats.statusCounts || {};
+      const statusLabels = Object.keys(statusCounts);
+      const statusValues = Object.values(statusCounts);
+
+      const statusColors = statusLabels.map(code => {
+        const num = Number(code);
+        if (num >= 200 && num < 300) return '#10b981';
+        if (num === 401 || num === 403) return '#ef4444';
+        if (num === 429) return '#f59e0b';
+        return '#6366f1';
+      });
+
+      const ctxStatus = $('statusPieChart').getContext('2d');
+      statusChart = new Chart(ctxStatus, {
+        type: 'pie',
+        data: {
+          labels: statusLabels.length ? statusLabels.map(s => `HTTP ${s}`) : ['No Logs'],
+          datasets: [{
+            data: statusValues.length ? statusValues : [1],
+            backgroundColor: statusColors.length ? statusColors : ['#374151'],
+            borderColor: isDark ? '#141e33' : '#ffffff',
+            borderWidth: 2,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { boxWidth: 12, padding: 10 } }
+          }
+        }
+      });
+
+      // 4. Latency Bar Chart
+      if (latencyChart) latencyChart.destroy();
+      const latencyBuckets = stats.latencyBuckets || { "<10ms": 0, "10-50ms": 0, "50-200ms": 0, ">200ms": 0 };
+      const ctxLatency = $('latencyBarChart').getContext('2d');
+
+      latencyChart = new Chart(ctxLatency, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(latencyBuckets),
+          datasets: [{
+            label: 'Requests',
+            data: Object.values(latencyBuckets),
+            backgroundColor: ['#06b6d4', '#3b82f6', '#f59e0b', '#ef4444'],
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+            x: { grid: { display: false }, ticks: { color: textColor } }
+          }
         }
       });
     }
 
-    function formatDate(iso) {
-      if (!iso) return 'N/A';
-      const d = new Date(iso);
-      return isNaN(d) ? iso : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    function renderBarsList() {
+      const container = $('clientBarsList');
+      container.innerHTML = '';
+      const total = rawAllowed.reduce((acc, c) => acc + (c.count || 0), 0);
+
+      if (!rawAllowed.length) {
+        container.innerHTML = '<div class="empty-state">No client hits recorded yet.</div>';
+        return;
+      }
+
+      [...rawAllowed]
+        .sort((a, b) => (b.count || 0) - (a.count || 0))
+        .slice(0, 6)
+        .forEach(item => {
+          const client = getClientName(item.userAgent);
+          const color = CLIENT_COLORS[client] || '#6366f1';
+          const pct = total > 0 ? (((item.count || 0) / total) * 100).toFixed(1) : 0;
+
+          const row = document.createElement('div');
+          row.className = 'bar-row';
+          row.innerHTML = `
+            <div class="bar-meta">
+              <span style="font-weight:600; display:flex; align-items:center; gap:0.4rem;">
+                <span style="width:8px; height:8px; border-radius:50%; background:${color};"></span>
+                ${escapeHtml(item.userAgent)}
+              </span>
+              <span style="color:var(--text-sub); font-family:var(--font-mono);">${item.count} hits (${pct}%)</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${pct}%; background:${color};"></div>
+            </div>
+          `;
+          container.appendChild(row);
+        });
     }
 
-    function escapeHtml(str) {
-      return str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '';
+    function renderAllowedTable() {
+      const q = $('searchAllowed').value.toLowerCase().trim();
+      const list = rawAllowed.filter(i =>
+        (i.userAgent && i.userAgent.toLowerCase().includes(q)) ||
+        (i.ip && i.ip.toLowerCase().includes(q))
+      );
+
+      $('allowedCountLabel').textContent = `${list.length} clients listed`;
+      const tbody = $('allowedTableBody');
+      tbody.innerHTML = '';
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No matching clients found.</td></tr>';
+        return;
+      }
+
+      list.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="mono">${escapeHtml(item.ip || '127.0.0.1')}</td>
+          <td><div style="max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(item.userAgent)}">${escapeHtml(item.userAgent)}</div></td>
+          <td><span class="pill pill-ok">${item.count || 1}</span></td>
+          <td style="color:var(--text-sub);">${item.lastHit ? new Date(item.lastHit).toLocaleTimeString() : 'N/A'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
+    function renderBlockedTable() {
+      const q = $('searchBlocked').value.toLowerCase().trim();
+      const list = rawBlocked.filter(i =>
+        (i.userAgent && i.userAgent.toLowerCase().includes(q)) ||
+        (i.ip && i.ip.toLowerCase().includes(q)) ||
+        (i.reason && i.reason.toLowerCase().includes(q))
+      );
+
+      $('blockedCountLabel').textContent = `${list.length} threats listed`;
+      const tbody = $('blockedTableBody');
+      tbody.innerHTML = '';
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No threats detected. System safe!</td></tr>';
+        return;
+      }
+
+      list.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="mono">${escapeHtml(item.ip || '127.0.0.1')}</td>
+          <td><div style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(item.userAgent)}">${escapeHtml(item.userAgent)}</div></td>
+          <td><span class="pill pill-bad">${item.count || 1}</span></td>
+          <td style="color:var(--danger); font-size:0.8rem;">${escapeHtml(item.reason || 'Pattern Match')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // TAB 2: AUDIT LOGS
+    $('searchAllowed').addEventListener('input', renderAllowedTable);
+    $('searchBlocked').addEventListener('input', renderBlockedTable);
+    $('searchAudit').addEventListener('input', renderAuditTable);
+
+    document.querySelectorAll('.filter-method').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-method').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeMethodFilter = btn.getAttribute('data-method');
+        renderAuditTable();
+      });
+    });
+
+    function renderAuditTable() {
+      const q = $('searchAudit').value.toLowerCase().trim();
+      let list = [...rawRequests].reverse();
+
+      if (activeMethodFilter !== 'ALL') {
+        list = list.filter(r => (r.method || '').toUpperCase() === activeMethodFilter);
+      }
+
+      if (q) {
+        list = list.filter(r =>
+          (r.url && r.url.toLowerCase().includes(q)) ||
+          (r.ip && r.ip.toLowerCase().includes(q)) ||
+          (r.headers?.['user-agent'] && r.headers['user-agent'].toLowerCase().includes(q)) ||
+          String(r.statusCode).includes(q)
+        );
+      }
+
+      const tbody = $('auditTableBody');
+      tbody.innerHTML = '';
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No audit logs matching criteria.</td></tr>';
+        return;
+      }
+
+      list.slice(0, 100).forEach(r => {
+        const tr = document.createElement('tr');
+        const m = (r.method || 'GET').toUpperCase();
+        let mClass = 'method-get';
+        if (m === 'POST') mClass = 'method-post';
+        if (m === 'PUT') mClass = 'method-put';
+        if (m === 'DELETE') mClass = 'method-delete';
+
+        const code = Number(r.statusCode) || 200;
+        let sClass = 'pill-ok';
+        if (code >= 400 && code < 500) sClass = (code === 401 || code === 403) ? 'pill-bad' : 'pill-warn';
+        if (code >= 500) sClass = 'pill-bad';
+
+        const ms = r.responseTime ?? 0;
+        const msColor = ms < 20 ? 'var(--success)' : ms < 100 ? 'var(--warning)' : 'var(--danger)';
+
+        tr.innerHTML = `
+          <td style="color:var(--text-sub); white-space:nowrap;">${r.timestamp ? new Date(r.timestamp).toLocaleTimeString() : 'N/A'}</td>
+          <td><span class="pill pill-method ${mClass}">${m}</span></td>
+          <td class="mono" style="color:var(--text-main); font-weight:500;">${escapeHtml(r.url || '/')}</td>
+          <td class="mono">${escapeHtml(r.ip || '127.0.0.1')}</td>
+          <td><span class="pill ${sClass}">${code}</span></td>
+          <td style="color:${msColor}; font-family:var(--font-mono); font-weight:600;">${ms} ms</td>
+          <td><div style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-sub);" title="${escapeHtml(r.headers?.['user-agent'] || '')}">${escapeHtml(r.headers?.['user-agent'] || 'N/A')}</div></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    $('btnExportJson').addEventListener('click', () => {
+      window.open('/api/analytics/export?format=json', '_blank');
+    });
+
+    $('btnExportCsv').addEventListener('click', () => {
+      window.open('/api/analytics/export?format=csv', '_blank');
+    });
+
+    $('btnClearLogs').addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to clear request audit logs?')) return;
+      try {
+        const res = await fetch('/api/analytics/clear?target=requests', { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          showToast('Audit logs cleared', 'success');
+          fetchAnalytics();
+        } else {
+          showToast('Failed to clear logs', 'error');
+        }
+      } catch (err) {
+        showToast('Error clearing logs', 'error');
+      }
+    });
+
+    // TAB 3: API TESTER STUDIO
+    const PRESET_MAP = {
+      getUsers: { method: 'GET', url: '/api/users', body: '' },
+      getUsersFiltered: { method: 'GET', url: '/api/users?role=admin', body: '' },
+      getUserStats: { method: 'GET', url: '/api/users/stats', body: '' },
+      getUserById: { method: 'GET', url: '/api/users/1', body: '' },
+      postUser: {
+        method: 'POST',
+        url: '/api/users',
+        body: JSON.stringify({ name: 'Tamim Iqbal', email: 'tamim@example.com', role: 'editor', status: 'active' }, null, 2)
+      },
+      putUser: {
+        method: 'PUT',
+        url: '/api/users/1',
+        body: JSON.stringify({ name: 'Aftab Farhan (Updated)', role: 'admin' }, null, 2)
+      },
+      deleteUser: { method: 'DELETE', url: '/api/users/4', body: '' },
+      getHealth: { method: 'GET', url: '/api/health', body: '' },
+      getAnalytics: { method: 'GET', url: '/api/analytics', body: '' },
+      unauthorized: { method: 'GET', url: '/api/users?token=wrong-token', body: '', token: '' }
+    };
+
+    $('studioPresets').addEventListener('change', e => {
+      const preset = PRESET_MAP[e.target.value];
+      if (!preset) return;
+      $('studioMethod').value = preset.method;
+      $('studioUrl').value = preset.url;
+      $('studioBody').value = preset.body;
+      if (preset.token !== undefined) $('studioToken').value = preset.token;
+      else $('studioToken').value = '123';
+    });
+
+    $('btnFormatJson').addEventListener('click', () => {
+      try {
+        const text = $('studioBody').value.trim();
+        if (!text) return;
+        const parsed = JSON.parse(text);
+        $('studioBody').value = JSON.stringify(parsed, null, 2);
+        showToast('JSON formatted', 'success');
+      } catch (err) {
+        showToast('Invalid JSON payload', 'error');
+      }
+    });
+
+    $('btnSendRequest').addEventListener('click', executeApiTest);
+
+    async function executeApiTest() {
+      const method = $('studioMethod').value;
+      const rawUrl = $('studioUrl').value.trim();
+      const token = $('studioToken').value.trim();
+      const bodyText = $('studioBody').value.trim();
+
+      const btn = $('btnSendRequest');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span> Sending…';
+
+      const startTime = performance.now();
+      try {
+        const headers = { 'Accept': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        let body = undefined;
+        if (['POST', 'PUT', 'PATCH'].includes(method) && bodyText) {
+          headers['Content-Type'] = 'application/json';
+          body = bodyText;
+        }
+
+        const res = await fetch(rawUrl, { method, headers, body });
+        const duration = Math.round(performance.now() - startTime);
+
+        let data;
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          data = await res.text();
+        }
+
+        const pill = $('respStatusPill');
+        pill.textContent = `HTTP ${res.status} ${res.statusText || ''}`;
+        pill.className = `pill ${res.ok ? 'pill-ok' : 'pill-bad'}`;
+
+        $('respDuration').textContent = `${duration} ms`;
+        $('respJson').textContent = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+
+        showToast(`Request complete (${res.status})`, res.ok ? 'success' : 'error');
+        fetchAnalytics();
+      } catch (err) {
+        const duration = Math.round(performance.now() - startTime);
+        $('respStatusPill').textContent = 'Network Error';
+        $('respStatusPill').className = 'pill pill-bad';
+        $('respDuration').textContent = `${duration} ms`;
+        $('respJson').textContent = `// Request Failed:\n${err.message}`;
+        showToast('Request failed', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚀</span> Execute Request';
+      }
+    }
+
+    $('btnCopyResponse').addEventListener('click', () => {
+      const text = $('respJson').textContent;
+      navigator.clipboard.writeText(text).then(() => showToast('Response copied to clipboard', 'success'));
+    });
+
+    // TAB 4: USER MANAGEMENT STUDIO
+    async function loadUsers() {
+      try {
+        const res = await fetch('/api/users?token=123');
+        if (!res.ok) throw new Error('Failed to fetch users');
+        const json = await res.json();
+        rawUsers = json.data || [];
+        renderUsersTable();
+      } catch (err) {
+        showToast('Error loading users', 'error');
+      }
+    }
+
+    $('searchUsersInput').addEventListener('input', renderUsersTable);
+    $('filterUserRole').addEventListener('change', renderUsersTable);
+
+    function renderUsersTable() {
+      const q = $('searchUsersInput').value.toLowerCase().trim();
+      const roleFilter = $('filterUserRole').value;
+
+      let list = rawUsers.filter(u => {
+        const matchRole = !roleFilter || u.role === roleFilter;
+        const matchQuery = !q || (u.name && u.name.toLowerCase().includes(q)) || (u.email && u.email.toLowerCase().includes(q));
+        return matchRole && matchQuery;
+      });
+
+      const tbody = $('usersTableBody');
+      tbody.innerHTML = '';
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No users found. Click "Add New User" to create one.</td></tr>';
+        return;
+      }
+
+      list.forEach(u => {
+        const tr = document.createElement('tr');
+        const roleClass = u.role === 'admin' ? 'role-admin' : u.role === 'editor' ? 'role-editor' : 'role-user';
+        const statusClass = u.status === 'inactive' ? 'pill-warn' : 'pill-ok';
+
+        tr.innerHTML = `
+          <td class="mono" style="font-weight:600;">#${u.id}</td>
+          <td style="font-weight:600;">${escapeHtml(u.name)}</td>
+          <td class="mono" style="color:var(--text-muted);">${escapeHtml(u.email)}</td>
+          <td><span class="role-badge ${roleClass}">${escapeHtml(u.role)}</span></td>
+          <td><span class="pill ${statusClass}">${escapeHtml(u.status || 'active')}</span></td>
+          <td style="color:var(--text-sub);">${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</td>
+          <td>
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="openEditUserModal(${u.id})">Edit</button>
+              <button class="btn btn-danger" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="deleteUserHandler(${u.id})">Delete</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // User Modal Logic
+    const userModal = $('userModal');
+    const userForm = $('userForm');
+
+    $('btnOpenAddUserModal').addEventListener('click', () => {
+      $('userModalTitle').textContent = 'Add New User';
+      $('formUserId').value = '';
+      userForm.reset();
+      userModal.classList.add('open');
+    });
+
+    $('btnCloseUserModal').addEventListener('click', () => userModal.classList.remove('open'));
+    $('btnCancelUserModal').addEventListener('click', () => userModal.classList.remove('open'));
+
+    window.openEditUserModal = function(id) {
+      const user = rawUsers.find(u => u.id === id);
+      if (!user) return;
+      $('userModalTitle').textContent = `Edit User #${user.id}`;
+      $('formUserId').value = user.id;
+      $('formUserName').value = user.name;
+      $('formUserEmail').value = user.email;
+      $('formUserRole').value = user.role;
+      $('formUserStatus').value = user.status || 'active';
+      userModal.classList.add('open');
+    };
+
+    userForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = $('formUserId').value;
+      const isEdit = Boolean(id);
+
+      const payload = {
+        name: $('formUserName').value.trim(),
+        email: $('formUserEmail').value.trim(),
+        role: $('formUserRole').value,
+        status: $('formUserStatus').value
+      };
+
+      const url = isEdit ? `/api/users/${id}?token=123` : '/api/users?token=123';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`User ${isEdit ? 'updated' : 'created'} successfully!`, 'success');
+          userModal.classList.remove('open');
+          loadUsers();
+          fetchAnalytics();
+        } else {
+          showToast(json.message || 'Operation failed', 'error');
+        }
+      } catch (err) {
+        showToast('Network error while saving user', 'error');
+      }
+    });
+
+    window.deleteUserHandler = async function(id) {
+      if (!confirm(`Are you sure you want to delete User #${id}?`)) return;
+      try {
+        const res = await fetch(`/api/users/${id}?token=123`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast('User deleted successfully', 'success');
+          loadUsers();
+          fetchAnalytics();
+        } else {
+          showToast(json.message || 'Failed to delete user', 'error');
+        }
+      } catch (err) {
+        showToast('Error deleting user', 'error');
+      }
+    };
+
+    // TAB 5: SYSTEM HEALTH
+    async function loadSystemHealth() {
+      try {
+        const res = await fetch('/api/health');
+        if (!res.ok) throw new Error('Health check error');
+        const json = await res.json();
+        const data = json.data || {};
+
+        $('healthStatus').textContent = data.status || 'UP';
+        $('healthUptime').textContent = `${data.uptimeSeconds || 0}s`;
+
+        const mem = data.memory || {};
+        $('healthHeapUsed').textContent = `${mem.heapUsedMB || 0} MB`;
+        $('healthHeapTotal').textContent = `Total: ${mem.heapTotalMB || 0} MB`;
+        $('healthRss').textContent = `${mem.rssMB || 0} MB`;
+      } catch (err) {
+        console.error('Failed to load system health:', err);
+      }
+    }
+
+    $('btnRefreshHealth').addEventListener('click', () => {
+      loadSystemHealth();
+      showToast('Health status updated', 'success');
+    });
+
+    // Boot Initial Load
     fetchAnalytics();
-    setInterval(fetchAnalytics, 5000);
+    resetAutoRefresh();
   </script>
 </body>
 

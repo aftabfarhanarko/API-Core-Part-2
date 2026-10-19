@@ -1,111 +1,124 @@
-// Mock Data
-let users = [
-  { id: 1, name: 'Aftab Farhan', email: 'farhan@example.com', role: 'admin' },
-  { id: 2, name: 'Rahim Ahmed', email: 'rahim@example.com', role: 'user' },
-  { id: 3, name: 'Karim Ullah', email: 'karim@example.com', role: 'user' },
-  { id: 4, name: 'Nusrat Jahan', email: 'nusrat@example.com', role: 'editor' }
-];
+const userService = require("../services/userservices");
+const ApiResponse = require("../utils/apiResponse");
 
-// GET all users
-const getAllUsers = (req, res) => {
-  res.status(200).json({
-    success: true,
-    total: users.length,
-    data: users
-  });
+/**
+ * GET /api/users
+ * Supports query parameters: search, role, status, page, limit, sortBy, sortOrder
+ */
+const getAllUsers = (req, res, next) => {
+  try {
+    const { search, role, status, page, limit, sortBy, sortOrder } = req.query;
+    const result = userService.getAllUsers({
+      search,
+      role,
+      status,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    });
+
+    return ApiResponse.success(res, {
+      statusCode: 200,
+      message: "Users retrieved successfully",
+      data: result.users,
+      meta: result.meta,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-// GET user by ID
-const getUserById = (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-  const user = users.find((u) => u.id === userId);
+/**
+ * GET /api/users/:id
+ */
+const getUserById = (req, res, next) => {
+  try {
+    const user = userService.getUserById(req.params.id);
 
-  if (!user) {
-    return res.status(404).json({
-      success: false,
-      message: 'User not found'
+    return ApiResponse.success(res, {
+      statusCode: 200,
+      message: "User details retrieved successfully",
+      data: user,
     });
+  } catch (error) {
+    next(error);
   }
-
-  res.status(200).json({
-    success: true,
-    data: user
-  });
 };
 
-// POST create new user
-const createUser = (req, res) => {
-  const { name, email, role } = req.body;
+/**
+ * POST /api/users
+ */
+const createUser = (req, res, next) => {
+  try {
+    const { name, email, role, status } = req.body;
+    const newUser = userService.createUser({ name, email, role, status });
 
-  if (!name || !email) {
-    return res.status(400).json({
-      success: false,
-      message: 'Name and email are required'
+    return ApiResponse.success(res, {
+      statusCode: 201,
+      message: "User created successfully",
+      data: newUser,
     });
+  } catch (error) {
+    next(error);
   }
-
-  const newUser = {
-    id: users.length ? users[users.length - 1].id + 1 : 1,
-    name,
-    email,
-    role: role || 'user'
-  };
-
-  users.push(newUser);
-  res.status(201).json({
-    success: true,
-    message: 'User created successfully',
-    data: newUser
-  });
 };
 
-// PUT update user by ID
-const updateUser = (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-  const userIndex = users.findIndex((u) => u.id === userId);
-
-  if (userIndex === -1) {
-    return res.status(404).json({
-      success: false,
-      message: 'User not found'
+/**
+ * PUT /api/users/:id
+ */
+const updateUser = (req, res, next) => {
+  try {
+    const { name, email, role, status } = req.body;
+    const updatedUser = userService.updateUser(req.params.id, {
+      name,
+      email,
+      role,
+      status,
     });
+
+    return ApiResponse.success(res, {
+      statusCode: 200,
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const { name, email, role } = req.body;
-
-  users[userIndex] = {
-    ...users[userIndex],
-    ...(name && { name }),
-    ...(email && { email }),
-    ...(role && { role })
-  };
-
-  res.status(200).json({
-    success: true,
-    message: 'User updated successfully',
-    data: users[userIndex]
-  });
 };
 
-// DELETE user by ID
-const deleteUser = (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-  const userIndex = users.findIndex((u) => u.id === userId);
+/**
+ * DELETE /api/users/:id
+ */
+const deleteUser = (req, res, next) => {
+  try {
+    const deletedUser = userService.deleteUser(req.params.id);
 
-  if (userIndex === -1) {
-    return res.status(404).json({
-      success: false,
-      message: 'User not found'
+    return ApiResponse.success(res, {
+      statusCode: 200,
+      message: "User deleted successfully",
+      data: deletedUser,
     });
+  } catch (error) {
+    next(error);
   }
+};
 
-  const deletedUser = users.splice(userIndex, 1);
+/**
+ * GET /api/users/stats
+ */
+const getUserStats = (req, res, next) => {
+  try {
+    const stats = userService.getUserStats();
 
-  res.status(200).json({
-    success: true,
-    message: 'User deleted successfully',
-    data: deletedUser[0]
-  });
+    return ApiResponse.success(res, {
+      statusCode: 200,
+      message: "User statistics retrieved successfully",
+      data: stats,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
@@ -113,6 +126,6 @@ module.exports = {
   getUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  getUserStats,
 };
-

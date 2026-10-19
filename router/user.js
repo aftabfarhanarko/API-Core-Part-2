@@ -3,16 +3,22 @@ const router = express.Router();
 const {
   getAllUsers,
   getUserById,
-  deleteUser,
   createUser,
   updateUser,
+  deleteUser,
+  getUserStats,
 } = require("../controllers/userControllers");
 
-router.get('/', getAllUsers);
-router.get('/:id', getUserById);
-router.post('/', createUser);
-router.put('/:id',  updateUser);
-router.delete('/:id',  deleteUser);
+// Aggregated statistics route (must be before /:id)
+router.get("/stats", getUserStats);
 
+// Collection routes
+router.get("/", getAllUsers);
+router.post("/", createUser);
+
+// Single resource routes
+router.get("/:id", getUserById);
+router.put("/:id", updateUser);
+router.delete("/:id", deleteUser);
 
 module.exports = router;

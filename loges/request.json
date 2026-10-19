@@ -1,0 +1,754 @@
+[
+  {
+    "timestamp": "2026-10-19T15:18:42.313Z",
+    "method": "POST",
+    "url": "/api/analytics/clear?target=requests",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "http://localhost:3000",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:18:42.317Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 2
+  },
+  {
+    "timestamp": "2026-10-19T15:18:43.747Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:18:48.748Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:18:54.011Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:18:56.026Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:18:59.027Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:02.027Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:05.027Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:08.027Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:09.040Z",
+    "method": "GET",
+    "url": "/dashboard",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 304,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:19:11.225Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:19:14.088Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:19:17.020Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 6
+  },
+  {
+    "timestamp": "2026-10-19T15:19:18.406Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:18.962Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:19.089Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:19:19.460Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:19.682Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:19.886Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:20.068Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 6
+  },
+  {
+    "timestamp": "2026-10-19T15:19:20.274Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:20.460Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:20.637Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 6
+  },
+  {
+    "timestamp": "2026-10-19T15:19:24.090Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:19:29.090Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:34.090Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:39.092Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 5
+  },
+  {
+    "timestamp": "2026-10-19T15:19:50.704Z",
+    "method": "GET",
+    "url": "/",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 3
+  },
+  {
+    "timestamp": "2026-10-19T15:19:50.712Z",
+    "method": "GET",
+    "url": "/api/health",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 1
+  },
+  {
+    "timestamp": "2026-10-19T15:19:50.715Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 1
+  },
+  {
+    "timestamp": "2026-10-19T15:19:50.726Z",
+    "method": "GET",
+    "url": "/api/users",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 401,
+    "responseTime": 3
+  },
+  {
+    "timestamp": "2026-10-19T15:19:50.729Z",
+    "method": "GET",
+    "url": "/api/users",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "[REDACTED]",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 2
+  },
+  {
+    "timestamp": "2026-10-19T15:20:34.565Z",
+    "method": "GET",
+    "url": "/api/health",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "sqlmap/1.6.4",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 403,
+    "responseTime": 3
+  },
+  {
+    "timestamp": "2026-10-19T15:21:48.867Z",
+    "method": "GET",
+    "url": "/",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 3
+  },
+  {
+    "timestamp": "2026-10-19T15:21:48.875Z",
+    "method": "GET",
+    "url": "/api/health",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 2
+  },
+  {
+    "timestamp": "2026-10-19T15:21:48.881Z",
+    "method": "GET",
+    "url": "/dashboard",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 4
+  },
+  {
+    "timestamp": "2026-10-19T15:21:48.888Z",
+    "method": "GET",
+    "url": "/api/users?token=123&page=1&limit=2",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "node",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 2
+  },
+  {
+    "timestamp": "2026-10-19T15:21:52.789Z",
+    "method": "GET",
+    "url": "/dashboard",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 7
+  },
+  {
+    "timestamp": "2026-10-19T15:21:54.740Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 11
+  },
+  {
+    "timestamp": "2026-10-19T15:21:57.884Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 10
+  },
+  {
+    "timestamp": "2026-10-19T15:22:02.886Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 12
+  },
+  {
+    "timestamp": "2026-10-19T15:22:07.885Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 11
+  },
+  {
+    "timestamp": "2026-10-19T15:22:12.884Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 10
+  },
+  {
+    "timestamp": "2026-10-19T15:22:17.885Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 11
+  },
+  {
+    "timestamp": "2026-10-19T15:22:22.883Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 10
+  },
+  {
+    "timestamp": "2026-10-19T15:22:27.885Z",
+    "method": "GET",
+    "url": "/api/analytics",
+    "ip": "127.0.0.1",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+      "authorization": "",
+      "x-api-key": "",
+      "referer": "http://localhost:3000/dashboard",
+      "origin": "",
+      "content-type": ""
+    },
+    "statusCode": 200,
+    "responseTime": 12
+  }
+]

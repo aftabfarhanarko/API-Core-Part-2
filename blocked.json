@@ -10,8 +10,8 @@
     "ip": "127.0.0.1",
     "userAgent": "sqlmap/1.6.4",
     "reason": "Matched pattern: /sqlmap/i",
-    "count": 1,
-    "lastAttempt": "2026-10-19T07:24:12.583Z"
+    "count": 2,
+    "lastAttempt": "2026-10-19T15:20:34.563Z"
   },
   {
     "ip": "::1",
@@ -19,5 +19,12 @@
     "reason": "Matched pattern: /curl/",
     "count": 2,
     "lastAttempt": "2026-10-19T13:51:20.793Z"
+  },
+  {
+    "ip": "127.0.0.1",
+    "userAgent": "curl/8.18.0",
+    "reason": "Matched pattern: /curl/",
+    "count": 1,
+    "lastAttempt": "2026-10-19T14:41:37.614Z"
   }
 ]
